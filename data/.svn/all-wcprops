@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/repos/srsv/!svn/ver/3024/branches/current/data
+END
+fips10_4
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/2909/branches/current/data/fips10_4
+END
+iso3166
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/repos/srsv/!svn/ver/2909/branches/current/data/iso3166
+END
+iso3166_2
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/repos/srsv/!svn/ver/2909/branches/current/data/iso3166_2
+END
+country-codes.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/2866/branches/current/data/country-codes.txt
+END

@@ -1,0 +1,6 @@
+%BChanServ OP%B allows you to set channel op mode on either
+yourself or on other people in a channel.
+
+Syntax:
+        OP <channel> [nick [nick ...]]
+        OP <channel> [channel [channel]]

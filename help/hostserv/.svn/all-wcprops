@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/2866/branches/current/help/hostserv
+END
+sethost.txt
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/srsv/!svn/ver/2866/branches/current/help/hostserv/sethost.txt
+END
+off.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/srsv/!svn/ver/2866/branches/current/help/hostserv/off.txt
+END
+list.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/2866/branches/current/help/hostserv/list.txt
+END
+on.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/2866/branches/current/help/hostserv/on.txt
+END
+del.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/srsv/!svn/ver/2866/branches/current/help/hostserv/del.txt
+END

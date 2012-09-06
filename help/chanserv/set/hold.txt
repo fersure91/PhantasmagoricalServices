@@ -1,0 +1,5 @@
+%BChanServ SET HOLD%B Sets whether the given channel will
+expire.  Setting this to ON prevents the channel from
+expiring.
+
+Syntax: ChanServ SET #channel HOLD <ON/OFF>

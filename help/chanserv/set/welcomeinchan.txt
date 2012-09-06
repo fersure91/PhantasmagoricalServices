@@ -1,0 +1,5 @@
+%BChanServ SET WelcomeInChan%B instructs services to send
+WELCOME messages to the channel when a user joins, rather
+than to the user as a private NOTICE.
+
+Syntax: %BSET #chan WelcomeInChan %U{ON|OFF}%U%B

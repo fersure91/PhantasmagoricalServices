@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/IRCd
+END
+State.pm
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/IRCd/State.pm
+END
+Event.pm
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/IRCd/Event.pm
+END
+Queue.pm
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/IRCd/Queue.pm
+END
+IO.pm
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/IRCd/IO.pm
+END
+IRCdSpecific.pm
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/IRCd/IRCdSpecific.pm
+END

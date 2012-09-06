@@ -1,0 +1,9 @@
+%BChanServ AUTH%B allows channel SOps to delete old/stale
+entries from the pending access list.
+
+Syntax: %BAUTH %U<#channel>%U <LIST|DELETE> %U[number|name]%U%B
+
+Examples:
+/msg ChanServ AUTH #SurrealChat LIST
+/msg ChanServ AUTH #SurrealChat DELETE Alucard
+/msg ChanServ AUTH #SurrealChat DELETE 3

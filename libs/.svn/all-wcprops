@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/repos/srsv/!svn/ver/3060/branches/current/libs
+END
+event.pm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/2866/branches/current/libs/event.pm
+END
+module.pm
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/repos/srsv/!svn/ver/3052/branches/current/libs/module.pm
+END
+modes.pm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/3060/branches/current/libs/modes.pm
+END
+misc.pm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/repos/srsv/!svn/ver/2866/branches/current/libs/misc.pm
+END

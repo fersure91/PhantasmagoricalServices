@@ -1,0 +1,10 @@
+Modify Services Operator
+ 
+Syntax: SVSOP <ADD|DEL|LIST> <nick> <H|O|A|R>
+ 
+Services Access:
+ 
+H       HelpOp
+O       [Services] Operator
+A       [Services] Admin
+R       Services Root

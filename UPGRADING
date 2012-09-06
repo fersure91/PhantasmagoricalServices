@@ -1,0 +1,16 @@
+-----------------------------------------------------------------------
+VERSION-SPECIFIC CHANGES
+
+0.4.1:
+You must move all mysql settings from services.conf to sql.conf
+
+0.4.2: Adds support for password-hashing, and makes a lot of changes to
+the database schema. running db-setup.pl is required.
+
+-----------------------------------------------------------------------
+
+The db-setup.pl script should perform any database changes or
+conversions.
+
+If you have any problems, contact the coders on SurrealChat.net in
+#dev.lounge. We'll help out as best we can.

@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/repos/srsv/!svn/ver/3095/branches/current/config-example
+END
+main.conf
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/srsv/!svn/ver/2867/branches/current/config-example/main.conf
+END
+sql.conf
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/config-example/sql.conf
+END
+services.conf
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/srsv/!svn/ver/3095/branches/current/config-example/services.conf
+END

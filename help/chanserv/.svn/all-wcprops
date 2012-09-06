@@ -1,0 +1,239 @@
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv
+END
+kick.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/kick.txt
+END
+akick.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/akick.txt
+END
+count.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/count.txt
+END
+cf.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/cf.txt
+END
+welcome.txt
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/welcome.txt
+END
+invite.txt
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/invite.txt
+END
+ban.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/ban.txt
+END
+resync.txt
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/resync.txt
+END
+voice.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/voice.txt
+END
+drone.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/drone.txt
+END
+why.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/why.txt
+END
+kickbanmask.txt
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/kickbanmask.txt
+END
+op.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/op.txt
+END
+aop.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/aop.txt
+END
+register.txt
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/register.txt
+END
+mode.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/mode.txt
+END
+up.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/up.txt
+END
+hop.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/hop.txt
+END
+clear.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/clear.txt
+END
+getkey.txt
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/getkey.txt
+END
+admin.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/admin.txt
+END
+levels.txt
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/levels.txt
+END
+info.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/info.txt
+END
+set.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/set.txt
+END
+kickmask.txt
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/kickmask.txt
+END
+auth.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/auth.txt
+END
+sop.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/sop.txt
+END
+kickban.txt
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/kickban.txt
+END
+unban.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/unban.txt
+END
+uop.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/uop.txt
+END
+drop.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/drop.txt
+END
+vop.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/vop.txt
+END
+mlock.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/mlock.txt
+END
+close.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/close.txt
+END
+down.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/down.txt
+END
+halfop.txt
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/halfop.txt
+END
+copy.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/copy.txt
+END
+list.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/list.txt
+END
+alist.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv/alist.txt
+END

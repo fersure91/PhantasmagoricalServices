@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/repos/srsv/!svn/ver/3016/branches/current/help/botserv
+END
+assign.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/2866/branches/current/help/botserv/assign.txt
+END
+del.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/2866/branches/current/help/botserv/del.txt
+END
+act.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/2866/branches/current/help/botserv/act.txt
+END
+unassign.txt
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/srsv/!svn/ver/2866/branches/current/help/botserv/unassign.txt
+END
+add.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/2866/branches/current/help/botserv/add.txt
+END
+list.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/srsv/!svn/ver/2866/branches/current/help/botserv/list.txt
+END
+set.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/3016/branches/current/help/botserv/set.txt
+END
+say.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/2866/branches/current/help/botserv/say.txt
+END

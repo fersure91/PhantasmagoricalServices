@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/repos/srsv/!svn/ver/3016/branches/current/help
+END
+botserv.txt
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/repos/srsv/!svn/ver/2866/branches/current/help/botserv.txt
+END
+nickserv.txt
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/repos/srsv/!svn/ver/2866/branches/current/help/nickserv.txt
+END
+operserv.txt
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/repos/srsv/!svn/ver/2885/branches/current/help/operserv.txt
+END
+botpriv.txt
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/repos/srsv/!svn/ver/2866/branches/current/help/botpriv.txt
+END
+adminserv.txt
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/repos/srsv/!svn/ver/2866/branches/current/help/adminserv.txt
+END
+core.txt
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/2866/branches/current/help/core.txt
+END
+chanserv.txt
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/repos/srsv/!svn/ver/2866/branches/current/help/chanserv.txt
+END
+securitybot.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/2866/branches/current/help/securitybot.txt
+END
+hostserv.txt
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/repos/srsv/!svn/ver/2866/branches/current/help/hostserv.txt
+END
+memoserv.txt
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/repos/srsv/!svn/ver/2866/branches/current/help/memoserv.txt
+END
+chanbot.txt
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/repos/srsv/!svn/ver/2866/branches/current/help/chanbot.txt
+END

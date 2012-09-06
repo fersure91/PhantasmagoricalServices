@@ -1,0 +1,125 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/repos/srsv/!svn/ver/3056/branches/current/SrSv
+END
+Debug.pm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/Debug.pm
+END
+Email.pm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/3052/branches/current/SrSv/Email.pm
+END
+Help.pm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/Help.pm
+END
+HostMask.pm
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/HostMask.pm
+END
+RunLevel.pm
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/RunLevel.pm
+END
+SimpleHash.pm
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/repos/srsv/!svn/ver/3048/branches/current/SrSv/SimpleHash.pm
+END
+Time.pm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/Time.pm
+END
+Agent.pm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/3052/branches/current/SrSv/Agent.pm
+END
+Conf2Consts.pm
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/repos/srsv/!svn/ver/3056/branches/current/SrSv/Conf2Consts.pm
+END
+TOR.pm
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/repos/srsv/!svn/ver/3032/branches/current/SrSv/TOR.pm
+END
+MySQL.pm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/3053/branches/current/SrSv/MySQL.pm
+END
+Shared.pm
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/Shared.pm
+END
+OnIRC.pm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/OnIRC.pm
+END
+Errors.pm
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/Errors.pm
+END
+Util.pm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/repos/srsv/!svn/ver/2917/branches/current/SrSv/Util.pm
+END
+User.pm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/User.pm
+END
+Timer.pm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/Timer.pm
+END
+Log.pm
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/repos/srsv/!svn/ver/3052/branches/current/SrSv/Log.pm
+END
+Message.pm
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/repos/srsv/!svn/ver/3032/branches/current/SrSv/Message.pm
+END
+Conf.pm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/repos/srsv/!svn/ver/2866/branches/current/SrSv/Conf.pm
+END

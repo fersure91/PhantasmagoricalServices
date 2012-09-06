@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/3095/branches/current/modules/serviceslibs
+END
+botserv.pm
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/repos/srsv/!svn/ver/3052/branches/current/modules/serviceslibs/botserv.pm
+END
+nickserv.pm
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/srsv/!svn/ver/3095/branches/current/modules/serviceslibs/nickserv.pm
+END
+operserv.pm
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/srsv/!svn/ver/3052/branches/current/modules/serviceslibs/operserv.pm
+END
+adminserv.pm
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/repos/srsv/!svn/ver/2869/branches/current/modules/serviceslibs/adminserv.pm
+END
+chanserv.pm
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/srsv/!svn/ver/3047/branches/current/modules/serviceslibs/chanserv.pm
+END
+hostserv.pm
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/srsv/!svn/ver/3010/branches/current/modules/serviceslibs/hostserv.pm
+END
+memoserv.pm
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/srsv/!svn/ver/3018/branches/current/modules/serviceslibs/memoserv.pm
+END

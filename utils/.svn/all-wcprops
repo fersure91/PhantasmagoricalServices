@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/repos/srsv/!svn/ver/3046/branches/current/utils
+END
+country-table.pl
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/3045/branches/current/utils/country-table.pl
+END
+db-dump.pl
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/repos/srsv/!svn/ver/3045/branches/current/utils/db-dump.pl
+END
+country-table2.pl
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/3045/branches/current/utils/country-table2.pl
+END
+country-table3.pl
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/srsv/!svn/ver/3045/branches/current/utils/country-table3.pl
+END
+blacklistLoader.pl
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/srsv/!svn/ver/3046/branches/current/utils/blacklistLoader.pl
+END
+geoip.pl
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/repos/srsv/!svn/ver/3045/branches/current/utils/geoip.pl
+END
+stresstest.pl
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/repos/srsv/!svn/ver/2901/branches/current/utils/stresstest.pl
+END
+archivelogs.pl
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/srsv/!svn/ver/2901/branches/current/utils/archivelogs.pl
+END

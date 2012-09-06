@@ -1,0 +1,4 @@
+NickServ SET AUTH enables selective Channel Rank acceptance.
+See HELP NickServ AUTH for more information.
+
+Syntax: %BSET [nick] AUTH %U{ON|OFF}%U%B

@@ -1,0 +1,5 @@
+%BChanServ SET NEVEROP%B Prevents services from opping users
+in the channel. Users may still use the UP command to gain
+chanop.
+ 
+Syntax: %BSET #chan NEVEROP %U{ON|OFF}%U%B

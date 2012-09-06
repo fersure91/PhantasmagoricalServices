@@ -1,0 +1,5 @@
+AdminServ Commands
+
+SVSOP     - Modify Services Operator
+WHOIS     - Check rank of an individual
+STAFF     - List all Services Ops

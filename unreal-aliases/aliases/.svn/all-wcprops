@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/2866/branches/current/unreal-aliases/aliases
+END
+genericservices.conf
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/repos/srsv/!svn/ver/2866/branches/current/unreal-aliases/aliases/genericservices.conf
+END
+ircd.conf
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/srsv/!svn/ver/2866/branches/current/unreal-aliases/aliases/ircd.conf
+END
+surrealservices.conf
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/repos/srsv/!svn/ver/2866/branches/current/unreal-aliases/aliases/surrealservices.conf
+END

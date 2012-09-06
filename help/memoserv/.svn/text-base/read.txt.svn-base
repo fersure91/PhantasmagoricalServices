@@ -1,0 +1,5 @@
+Syntax: %BREAD {%Bnum%B|%BLAST%B}%B
+
+Sends you the text of memo number %Bnum%B, or of the last
+(i.e. most recently received) memo if LAST is given
+instead of a number.

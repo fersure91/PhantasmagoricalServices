@@ -1,0 +1,7 @@
+%BChanServ SET VERBOSE%B enables various channel notices for
+ChanServ and BotServ commands.
+
+  VOICE/HOP/OP/PROTECT      - Set and Unset
+  AKick                     - Add/Delete/Move/Wipe
+  VOp/HOp/AOp/SOp/CoFounder - Add/Delete/Move/Wipe
+  BotSay                    - Usage

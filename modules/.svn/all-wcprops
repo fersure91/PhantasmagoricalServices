@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/repos/srsv/!svn/ver/3095/branches/current/modules
+END
+core.pm
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/repos/srsv/!svn/ver/3052/branches/current/modules/core.pm
+END
+connectserv.pm
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/3052/branches/current/modules/connectserv.pm
+END
+securitybot.pm
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/srsv/!svn/ver/3052/branches/current/modules/securitybot.pm
+END
+echoserv.pm
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/repos/srsv/!svn/ver/2869/branches/current/modules/echoserv.pm
+END
+logserv.pm
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/repos/srsv/!svn/ver/3052/branches/current/modules/logserv.pm
+END
+country.pm
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/repos/srsv/!svn/ver/2869/branches/current/modules/country.pm
+END
+geoip.pm
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/repos/srsv/!svn/ver/3034/branches/current/modules/geoip.pm
+END
+services.pm
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/repos/srsv/!svn/ver/3095/branches/current/modules/services.pm
+END

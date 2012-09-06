@@ -1,0 +1,14 @@
+%BChanServ SET BANTYPE%B determines the kind of ban that
+ChanServ will use for kickbans and akicks.
+Default is 2.
+
+  0 - *!user@host.domain
+  1 - *!*user@host.domain
+  2 - *!*@host.domain
+  3 - *!*user@*.domain
+  4 - *!*@*.domain
+  5 - nick!user@host.domain
+  6 - nick!*user@host.domain
+  7 - nick!*@host.domain
+  8 - nick!*user@*.domain
+  9 - nick!*@*.domain

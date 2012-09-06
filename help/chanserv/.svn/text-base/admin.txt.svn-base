@@ -1,0 +1,6 @@
+%BChanServ ADMIN%B allows you to set channel-admin mode on
+either yourself or on other people in a channel.
+
+Syntax:
+        ADMIN <channel> [nick [nick ...]]
+        ADMIN <channel> [channel [channel]]
