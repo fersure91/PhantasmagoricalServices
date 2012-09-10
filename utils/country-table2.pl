@@ -58,6 +58,9 @@ sub main() {
 	newTable($dbh);
 	print "Inserting data...     ";
 	loadData($dbh);
+	print "Converting data...\n";
+	convert($dbh);
+	print "Performing cleanup...\n";
 	cleanup($dbh);
 	$dbh->disconnect();
 	print "Country table update complete.\n";
@@ -124,7 +127,7 @@ sub newTable($) {
 
 	$dbh->do("DROP TABLE IF EXISTS newcountry");
 	$dbh->do(
-	"CREATE TABLE `newcountry` (
+	"CREATE TEMPORARY TABLE `tmpcountry` (
 	  `low` int unsigned NOT NULL default 0,
 	  `high` int unsigned NOT NULL default 0,
 	  `country` char(2) NOT NULL default '-',
@@ -142,9 +145,9 @@ sub loadData($) {
 	my ($i, @entries);
 
 	open ((my $COUNTRYTABLE), '<', $unpackPath);
-	my $add_entry = $dbh->prepare("INSERT INTO newcountry SET low=INET_ATON(?), high=INET_ATON(?), country=?");
-	$dbh->do("ALTER TABLE `newcountry` DISABLE KEYS");
-	$dbh->do("LOCK TABLES newcountry WRITE");
+	my $add_entry = $dbh->prepare("INSERT INTO tmpcountry SET low=INET_ATON(?), high=INET_ATON(?), country=?");
+	$dbh->do("ALTER TABLE `tmpcountry` DISABLE KEYS");
+	$dbh->do("LOCK TABLES tmpcountry WRITE");
 	while(my $x = <$COUNTRYTABLE>) {
 		if($i == 0 or !($i % $div)) {
 			printf("\b\b\b\b%3d%", ($i/$lines)*100);
@@ -159,16 +162,38 @@ sub loadData($) {
 		push @entries,
 			'(INET_ATON('.$dbh->quote($low).'),'.'INET_ATON('.$dbh->quote($high).'),'.$dbh->quote($country).')';
 		if(scalar(@entries) >= 100) { #1000 only gives another 10% boost for 10x as much memory
-			$dbh->do("INSERT IGNORE INTO newcountry (low, high, country) VALUES ".join(',', @entries));
+			$dbh->do("INSERT IGNORE INTO tmpcountry (low, high, country) VALUES ".join(',', @entries));
 			@entries = ();
 		}
 
 		$i++;
 	}
-	$dbh->do("INSERT IGNORE INTO newcountry (low, high, country) VALUES ".join(',', @entries)) if scalar(@entries);
+	$dbh->do("INSERT IGNORE INTO tmpcountry (low, high, country) VALUES ".join(',', @entries)) if scalar(@entries);
 	$dbh->do("UNLOCK TABLES");
-	$dbh->do("ALTER TABLE `newcountry` ENABLE KEYS");
+	$dbh->do("ALTER TABLE `tmpcountry` ENABLE KEYS");
 	close $COUNTRYTABLE;
+}
+
+sub convert($) {
+	my ($dbh) = @_;
+	$dbh->do(
+	"CREATE TABLE newcountry (
+	  id int unsigned not null AUTO_INCREMENT,
+	  ip_poly polygon not null,
+	  low int unsigned not null,
+	  high int unsigned not null,
+	  country char(2) not null default '-',
+	  PRIMARY KEY (`id`),
+	  UNIQUE KEY (`low`, `high`),
+	  SPATIAL INDEX (`ip_poly`)
+	);"
+	);
+	$dbh->do(
+	"INSERT INTO newcountry (low,high,country,ip_poly)
+		SELECT low, high, country,
+		GEOMFROMWKB(POLYGON(LINESTRING( POINT(low, -1), POINT(high, -1),
+		POINT(high, 1), POINT(low, 1), POINT(low, -1)))) FROM tmpcountry;"
+	);
 }
 
 sub cleanup($) {

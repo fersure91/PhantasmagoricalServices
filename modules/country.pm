@@ -37,11 +37,11 @@ our ($get_ip_country, $get_ip_country_aton, $get_user_country);
 
 proc_init {
 	$get_ip_country = $dbh->prepare_cached("SELECT country FROM country WHERE
-		? BETWEEN low AND high");
+		MBRCONTAINS(ip_poly, POINTFROMWKB(POINT(?, 0)))");
 	$get_ip_country_aton = $dbh->prepare_cached("SELECT country FROM country WHERE
-		INET_ATON(?) BETWEEN low AND high");
+		MBRCONTAINS(ip_poly, POINTFROMWKB(POINT(INET_ATON(?), 0)))");
 	$get_user_country = $dbh->prepare_cached("SELECT country FROM country, user WHERE
-		user.ip BETWEEN low AND high and user.id=?");
+		MBRCONTAINS(ip_poly, POINTFROMWKB(POINT(user.ip, 0))) and user.id=?");
 };
 
 sub get_ip_country($) {
