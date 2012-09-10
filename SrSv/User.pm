@@ -48,14 +48,14 @@ BEGIN {
 	require constant; import constant (\%constants);
 }
 
-use SrSv::MySQL::Stub {
-	 __getIPV4 => ['SCALAR', "SELECT INET_NTOA(ip) FROM user WHERE id=?"],
-};
+#use SrSv::MySQL::Stub {
+#	 __getIPV4 => ['SCALAR', "SELECT INET_NTOA(ip) FROM user WHERE id=?"],
+#};
 	
 	
 
 use SrSv::Process::Init;
-use SrSv::MySQL '$dbh';
+#use SrSv::MySQL '$dbh';
 use SrSv::NickControl::Enforcer qw(%enforcers);
 use SrSv::IRCd::State qw(synced);
 use SrSv::Agent qw(is_agent);
@@ -71,22 +71,22 @@ our (
 	$get_host, $get_vhost, $get_cloakhost, $get_ip, $get_user_info,
 );
 
-proc_init {
-	$get_user_id = $dbh->prepare("SELECT id FROM user WHERE nick=?");
-	$get_user_nick = $dbh->prepare("SELECT nick FROM user WHERE id=?");
-	$get_nickchg = $dbh->prepare("SELECT nickchg.nickid, user.nick FROM nickchg, user WHERE user.id=nickchg.nickid AND nickchg.nick=?");
-	$is_online = $dbh->prepare("SELECT 1 FROM user WHERE nick=? AND online=1");
+#proc_init {
+#	$get_user_id = $dbh->prepare("SELECT id FROM user WHERE nick=?");
+#	$get_user_nick = $dbh->prepare("SELECT nick FROM user WHERE id=?");
+#	$get_nickchg = $dbh->prepare("SELECT nickchg.nickid, user.nick FROM nickchg, user WHERE user.id=nickchg.nickid AND nickchg.nick=?");
+#	$is_online = $dbh->prepare("SELECT 1 FROM user WHERE nick=? AND online=1");
 
-	$get_user_flags = $dbh->prepare("SELECT flags FROM user WHERE id=?");
-	$set_user_flag = $dbh->prepare("UPDATE user SET flags=(flags | (?)) WHERE id=?");
-	$unset_user_flag = $dbh->prepare("UPDATE user SET flags=(flags & ~(?)) WHERE id=?");
-	$set_user_flag_all = $dbh->prepare("UPDATE user SET flags=flags | ?");
+#	$get_user_flags = $dbh->prepare("SELECT flags FROM user WHERE id=?");
+#	$set_user_flag = $dbh->prepare("UPDATE user SET flags=(flags | (?)) WHERE id=?");
+#	$unset_user_flag = $dbh->prepare("UPDATE user SET flags=(flags & ~(?)) WHERE id=?");
+#	$set_user_flag_all = $dbh->prepare("UPDATE user SET flags=flags | ?");
 
-	$get_host = $dbh->prepare("SELECT ident, host FROM user WHERE id=?");
-	$get_vhost = $dbh->prepare("SELECT ident, vhost FROM user WHERE id=?");
-	$get_cloakhost = $dbh->prepare("SELECT 1, cloakhost FROM user WHERE id=?");
-	$get_user_info  = $dbh->prepare("SELECT ident, host, vhost, gecos, server FROM user WHERE id=?");
-};
+#	$get_host = $dbh->prepare("SELECT ident, host FROM user WHERE id=?");
+#	$get_vhost = $dbh->prepare("SELECT ident, vhost FROM user WHERE id=?");
+#	$get_cloakhost = $dbh->prepare("SELECT 1, cloakhost FROM user WHERE id=?");
+#	$get_user_info  = $dbh->prepare("SELECT ident, host, vhost, gecos, server FROM user WHERE id=?");
+#};
 
 sub get_user_id($) {
 	my ($user) = @_;

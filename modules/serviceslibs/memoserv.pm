@@ -16,7 +16,7 @@
 package memoserv;
 
 use strict;
-use DBI qw(:sql_types);
+#use DBI qw(:sql_types);
 #use constant {
 #	READ => 1,
 #	DEL => 2,
@@ -37,7 +37,7 @@ use SrSv::Help qw( sendhelp );
 use SrSv::NickReg::Flags;
 use SrSv::NickReg::User qw(is_identified get_nick_user_nicks);
 
-use SrSv::MySQL '$dbh';
+#use SrSv::MySQL '$dbh';
 
 use SrSv::Util qw( makeSeqList );
 
@@ -65,55 +65,55 @@ our (
 );
 
 sub init() {
-	$send_memo = $dbh->prepare("INSERT INTO memo SELECT ?, id, NULL, UNIX_TIMESTAMP(), NULL, ? FROM nickreg WHERE nick=?");
-	$send_chan_memo = $dbh->prepare("INSERT INTO memo SELECT ?, nickreg.id, ?, ?, NULL, ? FROM chanacc, nickreg
-		WHERE chanacc.chan=? AND chanacc.level >= ? AND chanacc.nrid=nickreg.id
-		AND !(nickreg.flags & ". NRF_NOMEMO() . ")");
-	$get_chan_recipients = $dbh->prepare("SELECT user.nick FROM user, nickid, nickreg, chanacc WHERE
-		user.id=nickid.id AND nickid.nrid=chanacc.nrid AND chanacc.nrid=nickreg.id AND chanacc.chan=?
-		AND level >= ? AND
-		!(nickreg.flags & ". NRF_NOMEMO() . ")");
+	$send_memo = undef; #$dbh->prepare("INSERT INTO memo SELECT ?, id, NULL, UNIX_TIMESTAMP(), NULL, ? FROM nickreg WHERE nick=?");
+	$send_chan_memo = undef; #$dbh->prepare("INSERT INTO memo SELECT ?, nickreg.id, ?, ?, NULL, ? FROM chanacc, nickreg
+		#WHERE chanacc.chan=? AND chanacc.level >= ? AND chanacc.nrid=nickreg.id
+		#AND !(nickreg.flags & ". NRF_NOMEMO() . ")");
+	$get_chan_recipients = undef; #$dbh->prepare("SELECT user.nick FROM user, nickid, nickreg, chanacc WHERE
+	#	user.id=nickid.id AND nickid.nrid=chanacc.nrid AND chanacc.nrid=nickreg.id AND chanacc.chan=?
+	#	AND level >= ? AND
+	#	!(nickreg.flags & ". NRF_NOMEMO() . ")");
 
-	$get_memo_list = $dbh->prepare("SELECT memo.src, memo.chan, memo.time, memo.flag, memo.msg FROM memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id ORDER BY memo.time ASC");
+	$get_memo_list = undef; #$dbh->prepare("SELECT memo.src, memo.chan, memo.time, memo.flag, memo.msg FROM memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id ORDER BY memo.time ASC");
 
-	$get_memo = $dbh->prepare("SELECT memo.src, memo.chan, memo.time 
-		FROM memo JOIN nickreg ON (memo.dstid=nickreg.id) WHERE nickreg.nick=? ORDER BY memo.time ASC LIMIT 1 OFFSET ?");
-	$get_memo->bind_param(2, 0, SQL_INTEGER);
-	$get_memo_full = $dbh->prepare("SELECT memo.src, memo.chan, memo.time, memo.flag, memo.msg FROM memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id ORDER BY memo.time ASC LIMIT 1 OFFSET ?");
-	$get_memo_full->bind_param(2, 0, SQL_INTEGER);
-	$get_memo_count = $dbh->prepare("SELECT COUNT(*) FROM memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id");
-	$get_unread_memo_count = $dbh->prepare("SELECT COUNT(*) FROM memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id AND memo.flag=0");
+	$get_memo = undef; #$dbh->prepare("SELECT memo.src, memo.chan, memo.time 
+	#	FROM memo JOIN nickreg ON (memo.dstid=nickreg.id) WHERE nickreg.nick=? ORDER BY memo.time ASC LIMIT 1 OFFSET ?");
+	#$get_memo->bind_param(2, 0, SQL_INTEGER);
+	$get_memo_full = undef; #$dbh->prepare("SELECT memo.src, memo.chan, memo.time, memo.flag, memo.msg FROM memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id ORDER BY memo.time ASC LIMIT 1 OFFSET ?");
+	#$get_memo_full->bind_param(2, 0, SQL_INTEGER);
+	$get_memo_count = undef; #$dbh->prepare("SELECT COUNT(*) FROM memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id");
+	$get_unread_memo_count = undef; #$dbh->prepare("SELECT COUNT(*) FROM memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id AND memo.flag=0");
 
-	$set_flag = $dbh->prepare("UPDATE memo, nickreg SET memo.flag=? WHERE memo.src=? AND nickreg.nick=? AND memo.dstid=nickreg.id AND memo.chan=? AND memo.time=?");
+	$set_flag = undef; #$dbh->prepare("UPDATE memo, nickreg SET memo.flag=? WHERE memo.src=? AND nickreg.nick=? AND memo.dstid=nickreg.id AND memo.chan=? AND memo.time=?");
 
-	$delete_memo = $dbh->prepare("DELETE FROM memo USING memo, nickreg WHERE memo.src=? AND nickreg.nick=? AND memo.dstid=nickreg.id AND memo.chan=? AND memo.time=?");
-	$purge_memos = $dbh->prepare("DELETE FROM memo USING memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id AND memo.flag=1");
-	$delete_all_memos = $dbh->prepare("DELETE FROM memo USING memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id");
+	$delete_memo = undef; #$dbh->prepare("DELETE FROM memo USING memo, nickreg WHERE memo.src=? AND nickreg.nick=? AND memo.dstid=nickreg.id AND memo.chan=? AND memo.time=?");
+	$purge_memos = undef; #$dbh->prepare("DELETE FROM memo USING memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id AND memo.flag=1");
+	$delete_all_memos = undef; #$dbh->prepare("DELETE FROM memo USING memo, nickreg WHERE nickreg.nick=? AND memo.dstid=nickreg.id");
 
-	$add_ignore = $dbh->prepare("INSERT INTO ms_ignore (ms_ignore.nrid, ms_ignore.ignoreid, time)
-		SELECT nickreg.id, ignorenick.id, UNIX_TIMESTAMP() FROM nickreg, nickreg AS ignorenick
-		WHERE nickreg.nick=? AND ignorenick.nick=?");
-	$del_ignore_nick = $dbh->prepare("DELETE FROM ms_ignore USING ms_ignore
-		JOIN nickreg ON (ms_ignore.nrid=nickreg.id)
-		JOIN nickreg AS ignorenick ON(ms_ignore.ignoreid=ignorenick.id)
-		WHERE nickreg.nick=? AND ignorenick.nick=?");
-	$get_ignore_num = $dbh->prepare("SELECT ignorenick.nick FROM ms_ignore
-		JOIN nickreg ON (ms_ignore.nrid=nickreg.id)
-		JOIN nickreg AS ignorenick ON(ms_ignore.ignoreid=ignorenick.id)
-		WHERE nickreg.nick=?
-		ORDER BY ms_ignore.time LIMIT 1 OFFSET ?");
-	$get_ignore_num->bind_param(2, 0, SQL_INTEGER);
+	$add_ignore = undef; #$dbh->prepare("INSERT INTO ms_ignore (ms_ignore.nrid, ms_ignore.ignoreid, time)
+	#	SELECT nickreg.id, ignorenick.id, UNIX_TIMESTAMP() FROM nickreg, nickreg AS ignorenick
+	#	WHERE nickreg.nick=? AND ignorenick.nick=?");
+	$del_ignore_nick = undef; #$dbh->prepare("DELETE FROM ms_ignore USING ms_ignore
+	#	JOIN nickreg ON (ms_ignore.nrid=nickreg.id)
+	#	JOIN nickreg AS ignorenick ON(ms_ignore.ignoreid=ignorenick.id)
+	#	WHERE nickreg.nick=? AND ignorenick.nick=?");
+	$get_ignore_num = undef; #$dbh->prepare("SELECT ignorenick.nick FROM ms_ignore
+	#	JOIN nickreg ON (ms_ignore.nrid=nickreg.id)
+	#	JOIN nickreg AS ignorenick ON(ms_ignore.ignoreid=ignorenick.id)
+	#	WHERE nickreg.nick=?
+	#	ORDER BY ms_ignore.time LIMIT 1 OFFSET ?");
+	#$get_ignore_num->bind_param(2, 0, SQL_INTEGER);
 
-	$list_ignore = $dbh->prepare("SELECT ignorenick.nick, ms_ignore.time
-		FROM ms_ignore, nickreg, nickreg AS ignorenick
-		WHERE nickreg.nick=? AND ms_ignore.nrid=nickreg.id AND ms_ignore.ignoreid=ignorenick.id
-		ORDER BY ms_ignore.time");
-	$chk_ignore = $dbh->prepare("SELECT 1
-		FROM ms_ignore, nickreg, nickreg AS ignorenick
-		WHERE nickreg.nick=? AND ms_ignore.nrid=nickreg.id AND ignorenick.nick=? AND ms_ignore.ignoreid=ignorenick.id");
+	$list_ignore = undef; #$dbh->prepare("SELECT ignorenick.nick, ms_ignore.time
+	#	FROM ms_ignore, nickreg, nickreg AS ignorenick
+	#	WHERE nickreg.nick=? AND ms_ignore.nrid=nickreg.id AND ms_ignore.ignoreid=ignorenick.id
+	#	ORDER BY ms_ignore.time");
+	$chk_ignore = undef; #$dbh->prepare("SELECT 1
+	#	FROM ms_ignore, nickreg, nickreg AS ignorenick
+	#	WHERE nickreg.nick=? AND ms_ignore.nrid=nickreg.id AND ignorenick.nick=? AND ms_ignore.ignoreid=ignorenick.id");
 
-	$wipe_ignore = $dbh->prepare("DELETE FROM ms_ignore USING ms_ignore JOIN nickreg ON(ms_ignore.nrid=nickreg.id) WHERE nickreg.nick=?");
-	$purge_ignore = $dbh->prepare("DELETE FROM ms_ignore USING ms_ignore JOIN nickreg ON(ms_ignore.ignoreid=nickreg.id) WHERE nickreg.nick=?");
+	$wipe_ignore = undef; #$dbh->prepare("DELETE FROM ms_ignore USING ms_ignore JOIN nickreg ON(ms_ignore.nrid=nickreg.id) WHERE nickreg.nick=?");
+	$purge_ignore = undef; #$dbh->prepare("DELETE FROM ms_ignore USING ms_ignore JOIN nickreg ON(ms_ignore.ignoreid=nickreg.id) WHERE nickreg.nick=?");
 }
 
 ### MEMOSERV COMMANDS ###

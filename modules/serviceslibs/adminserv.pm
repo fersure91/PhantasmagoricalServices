@@ -30,7 +30,7 @@ use SrSv::Log;
 
 use SrSv::NickReg::Flags qw(NRF_NOHIGHLIGHT nr_chk_flag_user);
 
-use SrSv::MySQL '$dbh';
+#use SrSv::MySQL '$dbh';
 
 use constant {
 	S_HELP => 1,
@@ -80,19 +80,19 @@ our (
 );
 
 sub init() {
-	$create_svsop = $dbh->prepare("INSERT IGNORE INTO svsop SELECT id, NULL, NULL FROM nickreg WHERE nick=?");
-	$delete_svsop = $dbh->prepare("DELETE FROM svsop USING svsop, nickreg WHERE nickreg.nick=? AND svsop.nrid=nickreg.id");
+	$create_svsop = undef; #$dbh->prepare("INSERT IGNORE INTO svsop SELECT id, NULL, NULL FROM nickreg WHERE nick=?");
+	$delete_svsop = undef; #$dbh->prepare("DELETE FROM svsop USING svsop, nickreg WHERE nickreg.nick=? AND svsop.nrid=nickreg.id");
 
-	$get_svs_list = $dbh->prepare("SELECT nickreg.nick, svsop.adder FROM svsop, nickreg WHERE svsop.level=? AND svsop.nrid=nickreg.id ORDER BY nickreg.nick");
-	$get_all_svsops = $dbh->prepare("SELECT nickreg.nick, svsop.level, svsop.adder FROM svsop, nickreg WHERE svsop.nrid=nickreg.id ORDER BY svsop.level, nickreg.nick");
+	$get_svs_list = undef; #$dbh->prepare("SELECT nickreg.nick, svsop.adder FROM svsop, nickreg WHERE svsop.level=? AND svsop.nrid=nickreg.id ORDER BY nickreg.nick");
+	$get_all_svsops = undef; #$dbh->prepare("SELECT nickreg.nick, svsop.level, svsop.adder FROM svsop, nickreg WHERE svsop.nrid=nickreg.id ORDER BY svsop.level, nickreg.nick");
 
-	$get_svs_level = $dbh->prepare("SELECT svsop.level FROM svsop, nickalias WHERE nickalias.alias=? AND svsop.nrid=nickalias.nrid");
-	$set_svs_level = $dbh->prepare("UPDATE svsop, nickreg SET svsop.level=?, svsop.adder=? WHERE nickreg.nick=? AND svsop.nrid=nickreg.id");
-	$get_best_svs_level = $dbh->prepare("SELECT svsop.level, nickreg.nick FROM nickid, nickreg, svsop WHERE nickid.nrid=nickreg.id AND svsop.nrid=nickreg.id AND nickid.id=? ORDER BY level DESC LIMIT 1");
+	$get_svs_level = undef; #$dbh->prepare("SELECT svsop.level FROM svsop, nickalias WHERE nickalias.alias=? AND svsop.nrid=nickalias.nrid");
+	$set_svs_level = undef; #$dbh->prepare("UPDATE svsop, nickreg SET svsop.level=?, svsop.adder=? WHERE nickreg.nick=? AND svsop.nrid=nickreg.id");
+	$get_best_svs_level = undef; #$dbh->prepare("SELECT svsop.level, nickreg.nick FROM nickid, nickreg, svsop WHERE nickid.nrid=nickreg.id AND svsop.nrid=nickreg.id AND nickid.id=? ORDER BY level DESC LIMIT 1");
 
-	$chk_pass = $dbh->prepare("SELECT 1 FROM ircop WHERE nick=? AND pass=?");
-	$get_pass = $dbh->prepare("SELECT pass FROM ircop WHERE nick=?");
-	$set_pass = $dbh->prepare("UPDATE ircop SET pass=? WHERE nick=?");
+	$chk_pass = undef; #$dbh->prepare("SELECT 1 FROM ircop WHERE nick=? AND pass=?");
+	$get_pass = undef; #$dbh->prepare("SELECT pass FROM ircop WHERE nick=?");
+	$set_pass = undef; #$dbh->prepare("UPDATE ircop SET pass=? WHERE nick=?");
 }
 
 ### ADMINSERV COMMANDS ###

@@ -35,7 +35,7 @@ use SrSv::Help qw( sendhelp );
 use SrSv::ChanReg::Flags;
 use SrSv::NickReg::Flags qw(NRF_NOHIGHLIGHT nr_chk_flag_user);
 
-use SrSv::MySQL '$dbh';
+#use SrSv::MySQL '$dbh';
 
 use constant {
 	F_PRIVATE 	=> 1,
@@ -67,29 +67,29 @@ our (
 );
 
 sub init() {
-	$get_all_bots = $dbh->prepare("SELECT nick, ident, vhost, gecos, flags FROM bot");
-	$get_botchans = $dbh->prepare("SELECT chan, COALESCE(bot, '$chanserv::csnick') FROM chanreg WHERE bot != '' OR (flags & ". CRF_BOTSTAY() . ")");
-	$get_botstay_chans = $dbh->prepare("SELECT chan, COALESCE(bot, '$chanserv::csnick') FROM chanreg WHERE (flags & ".
-		CRF_BOTSTAY() . ")");
-	$get_chan_bot = $dbh->prepare("SELECT bot FROM chanreg WHERE chan=?");
-	$get_bots_chans = $dbh->prepare("SELECT chan FROM chanreg WHERE bot=?");
-	$get_bot_info = $dbh->prepare("SELECT nick, ident, vhost, gecos, flags FROM bot WHERE nick=?");
+	$get_all_bots = undef; #$dbh->prepare;("SELECT nick, ident, vhost, gecos, flags FROM bot");
+	$get_botchans = undef; #$dbh->prepare;("SELECT chan, COALESCE(bot, '$chanserv::csnick') FROM chanreg WHERE bot != '' OR (flags & ". CRF_BOTSTAY() . ")");
+	$get_botstay_chans = undef; #$dbh->prepare;("SELECT chan, COALESCE(bot, '$chanserv::csnick') FROM chanreg WHERE (flags & ".
+		#CRF_BOTSTAY() . ")");
+	$get_chan_bot = undef; #$dbh->prepare;("SELECT bot FROM chanreg WHERE chan=?");
+	$get_bots_chans = undef; #$dbh->prepare;("SELECT chan FROM chanreg WHERE bot=?");
+	$get_bot_info = undef; #$dbh->prepare;("SELECT nick, ident, vhost, gecos, flags FROM bot WHERE nick=?");
 
-	$create_bot = $dbh->prepare("INSERT INTO bot SET nick=?, ident=?, vhost=?, gecos=?");
-	$delete_bot = $dbh->prepare("DELETE FROM bot WHERE nick=?");
-	$delete_bot_allchans = $dbh->prepare("UPDATE chanreg SET bot='' WHERE bot=?");
-	$change_bot = $dbh->prepare("UPDATE bot SET nick=?, ident=?, vhost=?, gecos=? WHERE nick=?");
-	$update_chanreg_bot = $dbh->prepare("UPDATE chanreg SET bot=? WHERE bot=?");
+	$create_bot = undef; #$dbh->prepare;("INSERT INTO bot SET nick=?, ident=?, vhost=?, gecos=?");
+	$delete_bot = undef; #$dbh->prepare;("DELETE FROM bot WHERE nick=?");
+	$delete_bot_allchans = undef; #$dbh->prepare;("UPDATE chanreg SET bot='' WHERE bot=?");
+	$change_bot = undef; #$dbh->prepare;("UPDATE bot SET nick=?, ident=?, vhost=?, gecos=? WHERE nick=?");
+	$update_chanreg_bot = undef; #$dbh->prepare;("UPDATE chanreg SET bot=? WHERE bot=?");
 
-	$assign_bot = $dbh->prepare("UPDATE chanreg, bot SET chanreg.bot=bot.nick WHERE bot.nick=? AND chan=?");
-	$unassign_bot = $dbh->prepare("UPDATE chanreg SET chanreg.bot='' WHERE chan=?");
+	$assign_bot = undef; #$dbh->prepare;("UPDATE chanreg, bot SET chanreg.bot=bot.nick WHERE bot.nick=? AND chan=?");
+	$unassign_bot = undef; #$dbh->prepare;("UPDATE chanreg SET chanreg.bot='' WHERE chan=?");
 
-	$is_bot = $dbh->prepare("SELECT 1 FROM bot WHERE nick=?");
-	$has_bot = $dbh->prepare("SELECT 1 FROM chanreg WHERE chan=? AND bot != ''");
+	$is_bot = undef; #$dbh->prepare;("SELECT 1 FROM bot WHERE nick=?");
+	$has_bot = undef; #$dbh->prepare;("SELECT 1 FROM chanreg WHERE chan=? AND bot != ''");
 
-	$set_flag = $dbh->prepare("UPDATE bot SET flags=(flags | (?)) WHERE nick=?");
-	$unset_flag = $dbh->prepare("UPDATE bot SET flags=(flags & ~(?)) WHERE nick=?");
-	$get_flags = $dbh->prepare("SELECT flags FROM bot WHERE bot.nick=?");
+	$set_flag = undef; #$dbh->prepare;("UPDATE bot SET flags=(flags | (?)) WHERE nick=?");
+	$unset_flag = undef; #$dbh->prepare;("UPDATE bot SET flags=(flags & ~(?)) WHERE nick=?");
+	$get_flags = undef; #$dbh->prepare;("SELECT flags FROM bot WHERE bot.nick=?");
 
 	register() unless ima_worker; #FIXME
 };

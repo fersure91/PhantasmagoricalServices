@@ -35,7 +35,7 @@ use SrSv::Help qw( sendhelp );
 
 use SrSv::NickReg::Flags qw(NRF_NOHIGHLIGHT nr_chk_flag_user);
 
-use SrSv::MySQL '$dbh';
+#use SrSv::MySQL '$dbh';
 
 use constant {
 	MAX_LIM => 16777215
@@ -76,60 +76,60 @@ our (
 
 sub init() {
 =cut
-	$add_akill = $dbh->prepare("INSERT INTO akill SET setter=?, mask=?, reason=?, time=?, expire=?");
-	$del_akill = $dbh->prepare("DELETE FROM akill WHERE mask=?");
-	$get_all_akills = $dbh->prepare("SELECT setter, mask, reason, time, expire FROM akill ORDER BY time ASC");
-	$get_akill = $dbh->prepare("SELECT setter, mask, reason, time, expire FROM akill WHERE mask=?");
-	$check_akill = $dbh->prepare("SELECT 1 FROM akill WHERE mask=?");
+	$add_akill = undef; #$dbh->prepare("INSERT INTO akill SET setter=?, mask=?, reason=?, time=?, expire=?");
+	$del_akill = undef; #$dbh->prepare("DELETE FROM akill WHERE mask=?");
+	$get_all_akills = undef; #$dbh->prepare("SELECT setter, mask, reason, time, expire FROM akill ORDER BY time ASC");
+	$get_akill = undef; #$dbh->prepare("SELECT setter, mask, reason, time, expire FROM akill WHERE mask=?");
+	$check_akill = undef; #$dbh->prepare("SELECT 1 FROM akill WHERE mask=?");
 
-	$get_expired_akills = $dbh->prepare("SELECT setter, mask, reason, time, expire FROM akill WHERE expire < UNIX_TIMESTAMP() AND expire!=0");
+	$get_expired_akills = undef; #$dbh->prepare("SELECT setter, mask, reason, time, expire FROM akill WHERE expire < UNIX_TIMESTAMP() AND expire!=0");
 =cut
 
-	$add_qline = $dbh->prepare("INSERT INTO qline SET setter=?, mask=?, reason=?, time=?, expire=?");
-	$del_qline = $dbh->prepare("DELETE FROM qline WHERE mask=?");
-	$get_all_qlines = $dbh->prepare("SELECT setter, mask, reason, time, expire FROM qline ORDER BY time ASC");
-	$get_qline = $dbh->prepare("SELECT setter, mask, reason, time, expire FROM qline WHERE mask=?");
-	$check_qline = $dbh->prepare("SELECT 1 FROM qline WHERE mask=?");
+	$add_qline = undef; #$dbh->prepare("INSERT INTO qline SET setter=?, mask=?, reason=?, time=?, expire=?");
+	$del_qline = undef; #$dbh->prepare("DELETE FROM qline WHERE mask=?");
+	$get_all_qlines = undef; #$dbh->prepare("SELECT setter, mask, reason, time, expire FROM qline ORDER BY time ASC");
+	$get_qline = undef; #$dbh->prepare("SELECT setter, mask, reason, time, expire FROM qline WHERE mask=?");
+	$check_qline = undef; #$dbh->prepare("SELECT 1 FROM qline WHERE mask=?");
 
-	$get_expired_qlines = $dbh->prepare("SELECT mask FROM qline WHERE expire < UNIX_TIMESTAMP() AND expire!=0");
+	$get_expired_qlines = undef; #$dbh->prepare("SELECT mask FROM qline WHERE expire < UNIX_TIMESTAMP() AND expire!=0");
 
-	$add_logonnews = $dbh->prepare("INSERT INTO logonnews SET setter=?, expire=?, type=?, id=?, msg=?, time=UNIX_TIMESTAMP()");
-	$del_logonnews = $dbh->prepare("DELETE FROM logonnews WHERE type=? AND id=?");
-	$list_logonnews = $dbh->prepare("SELECT setter, time, expire, id, msg FROM logonnews WHERE type=? ORDER BY id ASC");
-	$get_logonnews = $dbh->prepare("SELECT setter, time, msg FROM logonnews WHERE type=? ORDER BY id ASC");
-	$consolidate_logonnews = $dbh->prepare("UPDATE logonnews SET id=id-1 WHERE type=? AND id>?");
-	$count_logonnews = $dbh->prepare("SELECT COUNT(*) FROM logonnews WHERE type=?");
-	$del_expired_logonnews = $dbh->prepare("DELETE FROM logonnews WHERE expire < UNIX_TIMESTAMP() AND expire!=0");
+	$add_logonnews = undef; #$dbh->prepare("INSERT INTO logonnews SET setter=?, expire=?, type=?, id=?, msg=?, time=UNIX_TIMESTAMP()");
+	$del_logonnews = undef; #$dbh->prepare("DELETE FROM logonnews WHERE type=? AND id=?");
+	$list_logonnews = undef; #$dbh->prepare("SELECT setter, time, expire, id, msg FROM logonnews WHERE type=? ORDER BY id ASC");
+	$get_logonnews = undef; #$dbh->prepare("SELECT setter, time, msg FROM logonnews WHERE type=? ORDER BY id ASC");
+	$consolidate_logonnews = undef; #$dbh->prepare("UPDATE logonnews SET id=id-1 WHERE type=? AND id>?");
+	$count_logonnews = undef; #$dbh->prepare("SELECT COUNT(*) FROM logonnews WHERE type=?");
+	$del_expired_logonnews = undef; #$dbh->prepare("DELETE FROM logonnews WHERE expire < UNIX_TIMESTAMP() AND expire!=0");
 	
-	$add_clone_exceptname = $dbh->prepare("REPLACE INTO sesexname SET host=?, serv=0, adder=?, lim=?");
-	$add_clone_exceptserver = $dbh->prepare("REPLACE INTO sesexname SET host=?, serv=1, adder=?, lim=?");
-	$add_clone_exceptip = $dbh->prepare("REPLACE INTO sesexip SET ip=INET_ATON(?), mask=?, adder=?, lim=?");
+	$add_clone_exceptname = undef; #$dbh->prepare("REPLACE INTO sesexname SET host=?, serv=0, adder=?, lim=?");
+	$add_clone_exceptserver = undef; #$dbh->prepare("REPLACE INTO sesexname SET host=?, serv=1, adder=?, lim=?");
+	$add_clone_exceptip = undef; #$dbh->prepare("REPLACE INTO sesexip SET ip=INET_ATON(?), mask=?, adder=?, lim=?");
 
-	$del_clone_exceptname = $dbh->prepare("DELETE FROM sesexname WHERE host=?");
-	$del_clone_exceptip = $dbh->prepare("DELETE FROM sesexip WHERE ip=INET_ATON(?)");
+	$del_clone_exceptname = undef; #$dbh->prepare("DELETE FROM sesexname WHERE host=?");
+	$del_clone_exceptip = undef; #$dbh->prepare("DELETE FROM sesexip WHERE ip=INET_ATON(?)");
 
-	$list_clone_exceptname = $dbh->prepare("SELECT host, adder, lim FROM sesexname WHERE serv=0 ORDER BY host ASC");
-	$list_clone_exceptserver = $dbh->prepare("SELECT host, adder, lim FROM sesexname WHERE serv=1 ORDER BY host ASC");
-	$list_clone_exceptip = $dbh->prepare("SELECT INET_NTOA(ip), mask, adder, lim FROM sesexip ORDER BY ip ASC");
+	$list_clone_exceptname = undef; #$dbh->prepare("SELECT host, adder, lim FROM sesexname WHERE serv=0 ORDER BY host ASC");
+	$list_clone_exceptserver = undef; #$dbh->prepare("SELECT host, adder, lim FROM sesexname WHERE serv=1 ORDER BY host ASC");
+	$list_clone_exceptip = undef; #$dbh->prepare("SELECT INET_NTOA(ip), mask, adder, lim FROM sesexip ORDER BY ip ASC");
 
-	$get_clones_fromhost = $dbh->prepare("SELECT user.nick, user.id, user.online
-		FROM user JOIN user AS clone ON (user.ip=clone.ip)
-		WHERE clone.host=? GROUP BY id");
-	$get_clones_fromnick = $dbh->prepare("SELECT user.nick, user.id, user.online
-		FROM user JOIN user AS clone ON (user.ip=clone.ip)
-		WHERE clone.nick=? GROUP BY id");
-	$get_clones_fromid = $dbh->prepare("SELECT user.nick, user.id, user.online
-		FROM user JOIN user AS clone ON (user.ip=clone.ip)
-		WHERE clone.id=? GROUP BY id");
-	$get_clones_fromipv4 = $dbh->prepare("SELECT user.nick, user.id, user.online
-		FROM user JOIN user AS clone ON (user.ip=clone.ip)
-		WHERE clone.ip=INET_ATON(?) GROUP BY id");
+	$get_clones_fromhost = undef; #$dbh->prepare("SELECT user.nick, user.id, user.online
+	#	FROM user JOIN user AS clone ON (user.ip=clone.ip)
+	#	WHERE clone.host=? GROUP BY id");
+	$get_clones_fromnick = undef; #$dbh->prepare("SELECT user.nick, user.id, user.online
+	#	FROM user JOIN user AS clone ON (user.ip=clone.ip)
+	#	WHERE clone.nick=? GROUP BY id");
+	$get_clones_fromid = undef; #$dbh->prepare("SELECT user.nick, user.id, user.online
+	#	FROM user JOIN user AS clone ON (user.ip=clone.ip)
+	#	WHERE clone.id=? GROUP BY id");
+	$get_clones_fromipv4 = undef; #$dbh->prepare("SELECT user.nick, user.id, user.online
+	#	FROM user JOIN user AS clone ON (user.ip=clone.ip)
+	#	WHERE clone.ip=INET_ATON(?) GROUP BY id");
 
-	$flood_check = $dbh->prepare("SELECT flood FROM user WHERE id=?");
-	$flood_inc = $dbh->prepare("UPDATE user SET flood = flood + ? WHERE id=?");
-	$flood_expire = $dbh->prepare("UPDATE user SET flood = flood >> 1"); # shift is faster than mul
+	$flood_check = undef; #$dbh->prepare("SELECT flood FROM user WHERE id=?");
+	$flood_inc = undef; #$dbh->prepare("UPDATE user SET flood = flood + ? WHERE id=?");
+	$flood_expire = undef; #$dbh->prepare("UPDATE user SET flood = flood >> 1"); # shift is faster than mul
 
-	$get_session_list = $dbh->prepare("SELECT host, COUNT(*) AS c FROM user WHERE online=1 GROUP BY host HAVING c >= ?");
+	$get_session_list = undef; #$dbh->prepare("SELECT host, COUNT(*) AS c FROM user WHERE online=1 GROUP BY host HAVING c >= ?");
 }
 
 sub dispatch($$$) {

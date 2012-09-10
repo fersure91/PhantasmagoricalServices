@@ -91,7 +91,8 @@ sub irc_error($) {
 			PeerAddr => $remote,
 			PeerPort => $port,
 			Proto => 'tcp',
-			Blocking => 1,
+			#Blocking => 1,
+			Timeout => 10
 		) or die("Could not connect to IRC server ($remote:$port): $!");
 		$irc_sock->blocking(0);
 		print " done\n" if DEBUG;

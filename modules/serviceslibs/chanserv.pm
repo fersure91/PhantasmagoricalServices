@@ -16,7 +16,7 @@
 package chanserv;
 
 use strict;
-use DBI qw(:sql_types);
+#use DBI qw(:sql_types);
 
 use SrSv::Timer qw(add_timer);
 
@@ -32,7 +32,7 @@ use SrSv::Agent;
 use SrSv::Shared qw(%enforcers $chanuser_table);
 
 #use SrSv::Conf qw(services);
-use SrSv::Conf2Consts qw(services sql );
+use SrSv::Conf2Consts qw(services);
 
 use SrSv::Time;
 use SrSv::Text::Format qw( columnar enum );
@@ -49,8 +49,8 @@ use SrSv::ChanReg::Flags;
 use SrSv::NickReg::Flags;
 use SrSv::NickReg::User qw(is_identified get_nick_users get_nick_user_nicks);
 
-use SrSv::MySQL '$dbh';
-use SrSv::MySQL::Glob;
+#use SrSv::MySQL '$dbh';
+#use SrSv::MySQL::Glob;
 
 use SrSv::Util qw( makeSeqList );
 
@@ -211,306 +211,306 @@ our (
 );
 
 sub init() {
-	#$chan_create = $dbh->prepare("INSERT IGNORE INTO chan SET id=(RAND()*294967293)+1, chan=?");
-	$get_joinpart_lock = $dbh->prepare("LOCK TABLES chan WRITE, chanuser WRITE");
-	$get_modelock_lock = $dbh->prepare("LOCK TABLES chanreg READ LOCAL, chan WRITE");
-	$get_update_modes_lock = $dbh->prepare("LOCK TABLES chan WRITE");
+	#$chan_create = undef; #$dbh->prepare("INSERT IGNORE INTO chan SET id=(RAND()*294967293)+1, chan=?");
+	$get_joinpart_lock = undef; #$dbh->prepare("LOCK TABLES chan WRITE, chanuser WRITE");
+	$get_modelock_lock = undef; #$dbh->prepare("LOCK TABLES chanreg READ LOCAL, chan WRITE");
+	$get_update_modes_lock = undef; #$dbh->prepare("LOCK TABLES chan WRITE");
 	
-	$chanjoin = $dbh->prepare("REPLACE INTO chanuser (seq,nickid,chan,op,joined) VALUES (?, ?, ?, ?, 1)");
-	$chanpart = $dbh->prepare("UPDATE chanuser SET joined=0, seq=?
-		WHERE nickid=? AND chan=? AND (seq <= ? OR seq > ?)");
-	#$chop = $dbh->prepare("UPDATE chanuser SET op=op+? WHERE nickid=? AND chan=?");
-	$chop = $dbh->prepare("UPDATE chanuser SET op=IF(op & ?, op, op ^ ?) WHERE nickid=? AND chan=?");
-	$chdeop = $dbh->prepare("UPDATE chanuser SET op=IF(op & ?, op ^ ?, op) WHERE nickid=? AND chan=?");
-	$get_op = $dbh->prepare("SELECT op FROM chanuser WHERE nickid=? AND chan=?");
-	$get_user_chans = $dbh->prepare("SELECT chan, op FROM chanuser WHERE nickid=? AND joined=1 AND (seq <= ? OR seq > ?)");
-	$get_user_chans_recent = $dbh->prepare("SELECT chan, joined, op FROM chanuser WHERE nickid=?");
+	$chanjoin = undef; #$dbh->prepare("REPLACE INTO chanuser (seq,nickid,chan,op,joined) VALUES (?, ?, ?, ?, 1)");
+	$chanpart = undef; #$dbh->prepare("UPDATE chanuser SET joined=0, seq=?
+	#	WHERE nickid=? AND chan=? AND (seq <= ? OR seq > ?)");
+	$chop = undef; #$dbh->prepare("UPDATE chanuser SET op=op+? WHERE nickid=? AND chan=?");
+	$chop = undef; #$dbh->prepare("UPDATE chanuser SET op=IF(op & ?, op, op ^ ?) WHERE nickid=? AND chan=?");
+	$chdeop = undef; #$dbh->prepare("UPDATE chanuser SET op=IF(op & ?, op ^ ?, op) WHERE nickid=? AND chan=?");
+	$get_op = undef; #$dbh->prepare("SELECT op FROM chanuser WHERE nickid=? AND chan=?");
+	$get_user_chans = undef; #$dbh->prepare("SELECT chan, op FROM chanuser WHERE nickid=? AND joined=1 AND (seq <= ? OR seq > ?)");
+	$get_user_chans_recent = undef; #$dbh->prepare("SELECT chan, joined, op FROM chanuser WHERE nickid=?");
 
-	$get_all_closed_chans = $dbh->prepare("SELECT chanclose.chan, chanclose.type, chanclose.reason, chanclose.nick, chanclose.time FROM chanreg, chanuser, chanclose WHERE chanreg.chan=chanuser.chan AND chanreg.chan=chanclose.chan AND chanreg.flags & ? GROUP BY chanclose.chan ORDER BY NULL");
-	$get_user_count = $dbh->prepare("SELECT COUNT(*) FROM chanuser WHERE chan=? AND joined=1");
+	$get_all_closed_chans = undef; #$dbh->prepare("SELECT chanclose.chan, chanclose.type, chanclose.reason, chanclose.nick, chanclose.time FROM chanreg, chanuser, chanclose WHERE chanreg.chan=chanuser.chan AND chanreg.chan=chanclose.chan AND chanreg.flags & ? GROUP BY chanclose.chan ORDER BY NULL");
+	$get_user_count = undef; #$dbh->prepare("SELECT COUNT(*) FROM chanuser WHERE chan=? AND joined=1");
 
-	$is_in_chan = $dbh->prepare("SELECT 1 FROM chanuser WHERE nickid=? AND chan=? AND joined=1");
+	$is_in_chan = undef; #$dbh->prepare("SELECT 1 FROM chanuser WHERE nickid=? AND chan=? AND joined=1");
 
-	#$lock_chanuser = $dbh->prepare("LOCK TABLES chanuser READ, user READ");
-	#$get_all_chan_users = $dbh->prepare("SELECT user.nick, chanuser.nickid, chanuser.chan FROM chanuser, user WHERE user.id=chanuser.nickid AND chanuser.joined=1");
-	$unlock_tables = $dbh->prepare("UNLOCK TABLES");
+	#$lock_chanuser = undef; #$dbh->prepare("LOCK TABLES chanuser READ, user READ");
+	#$get_all_chan_users = undef; #$dbh->prepare("SELECT user.nick, chanuser.nickid, chanuser.chan FROM chanuser, user WHERE user.id=chanuser.nickid AND chanuser.joined=1");
+	$unlock_tables = undef; #$dbh->prepare("UNLOCK TABLES");
 
-	$get_chan_users = $dbh->prepare("SELECT user.nick, user.id FROM chanuser, user
-		WHERE chanuser.chan=? AND user.id=chanuser.nickid AND chanuser.joined=1");
-	my $chan_users_noacc_tables = 'user '.
-		'JOIN chanuser ON (chanuser.nickid=user.id AND chanuser.joined=1 AND user.online=1) '.
-		'LEFT JOIN nickid ON (chanuser.nickid=nickid.id) '.
-		'LEFT JOIN chanacc ON (nickid.nrid=chanacc.nrid AND chanuser.chan=chanacc.chan)';
-	$get_chan_users_noacc = $dbh->prepare("SELECT user.nick, user.id FROM $chan_users_noacc_tables
-		WHERE chanuser.chan=?
-		GROUP BY user.id HAVING MAX(IF(chanacc.level IS NULL, 0, chanacc.level)) <= 0
-		ORDER BY NULL");
-	my $check_mask = "((user.nick LIKE ?) AND (user.ident LIKE ?)
-		AND ((user.vhost LIKE ?) OR (user.host LIKE ?) OR (user.cloakhost LIKE ?)))";
-	$get_chan_users_mask = $dbh->prepare("SELECT user.nick, user.id FROM chanuser, user
-		WHERE chanuser.chan=? AND user.id=chanuser.nickid AND chanuser.joined=1 AND $check_mask");
-	$get_chan_users_mask_noacc = $dbh->prepare("SELECT user.nick, user.id FROM $chan_users_noacc_tables
-		WHERE chanuser.chan=? AND $check_mask
-		GROUP BY user.id HAVING MAX(IF(chanacc.level IS NULL, 0, chanacc.level)) <= 0
-		ORDER BY NULL");
+	$get_chan_users = undef; #$dbh->prepare("SELECT user.nick, user.id FROM chanuser, user
+	#	WHERE chanuser.chan=? AND user.id=chanuser.nickid AND chanuser.joined=1");
+	my $chan_users_noacc_tables = undef; #'user '.
+	#	'JOIN chanuser ON (chanuser.nickid=user.id AND chanuser.joined=1 AND user.online=1) '.
+	#	'LEFT JOIN nickid ON (chanuser.nickid=nickid.id) '.
+	#	'LEFT JOIN chanacc ON (nickid.nrid=chanacc.nrid AND chanuser.chan=chanacc.chan)';
+	$get_chan_users_noacc = undef; #$dbh->prepare("SELECT user.nick, user.id FROM $chan_users_noacc_tables
+	#	WHERE chanuser.chan=?
+	#	GROUP BY user.id HAVING MAX(IF(chanacc.level IS NULL, 0, chanacc.level)) <= 0
+	#	ORDER BY NULL");
+	my $check_mask = undef; #"((user.nick LIKE ?) AND (user.ident LIKE ?)
+		#AND ((user.vhost LIKE ?) OR (user.host LIKE ?) OR (user.cloakhost LIKE ?)))";
+	$get_chan_users_mask = undef; #$dbh->prepare("SELECT user.nick, user.id FROM chanuser, user
+	#	WHERE chanuser.chan=? AND user.id=chanuser.nickid AND chanuser.joined=1 AND $check_mask");
+	$get_chan_users_mask_noacc = undef; #$dbh->prepare("SELECT user.nick, user.id FROM $chan_users_noacc_tables
+		#WHERE chanuser.chan=? AND $check_mask
+		#GROUP BY user.id HAVING MAX(IF(chanacc.level IS NULL, 0, chanacc.level)) <= 0
+		#ORDER BY NULL");
 
-	$get_users_nochans = $dbh->prepare("SELECT user.nick, user.id 
-		FROM user LEFT JOIN chanuser ON (chanuser.nickid=user.id AND chanuser.joined=1)
-		WHERE chanuser.chan IS NULL AND user.online=1");
-	$get_users_nochans_noid = $dbh->prepare("SELECT user.nick, user.id
-		FROM user LEFT JOIN chanuser ON (chanuser.nickid=user.id AND chanuser.joined=1)
-		LEFT JOIN nickid ON (nickid.id=user.id)
-		WHERE chanuser.chan IS NULL AND nickid.id IS NULL
-		AND user.online=1");
+	$get_users_nochans = undef; #$dbh->prepare("SELECT user.nick, user.id 
+	#	FROM user LEFT JOIN chanuser ON (chanuser.nickid=user.id AND chanuser.joined=1)
+	#	WHERE chanuser.chan IS NULL AND user.online=1");
+	$get_users_nochans_noid = undef; #$dbh->prepare("SELECT user.nick, user.id
+	#	FROM user LEFT JOIN chanuser ON (chanuser.nickid=user.id AND chanuser.joined=1)
+	#	LEFT JOIN nickid ON (nickid.id=user.id)
+	#	WHERE chanuser.chan IS NULL AND nickid.id IS NULL
+	#	AND user.online=1");
 
-	$get_using_nick_chans = $dbh->prepare("SELECT user.nick FROM user, nickid, nickreg, chanuser
-		WHERE user.id=nickid.id AND user.id=chanuser.nickid AND nickid.nrid=nickreg.id AND chanuser.joined=1
-		AND nickreg.nick=? AND chanuser.chan=?");
+	$get_using_nick_chans = undef; #$dbh->prepare("SELECT user.nick FROM user, nickid, nickreg, chanuser
+	#	WHERE user.id=nickid.id AND user.id=chanuser.nickid AND nickid.nrid=nickreg.id AND chanuser.joined=1
+	#	AND nickreg.nick=? AND chanuser.chan=?");
 
-	$get_lock = $dbh->prepare("SELECT GET_LOCK(?, 3)");
-	$release_lock = $dbh->prepare("DO RELEASE_LOCK(?)");
-	$is_free_lock = $dbh->prepare("SELECT IS_FREE_LOCK(?)");
+	$get_lock = undef; #$dbh->prepare("SELECT GET_LOCK(?, 3)");
+	$release_lock = undef; #$dbh->prepare("DO RELEASE_LOCK(?)");
+	$is_free_lock = undef; #$dbh->prepare("SELECT IS_FREE_LOCK(?)");
 
-	$chan_create = $dbh->prepare("INSERT IGNORE INTO chan SET seq=?, chan=?");
-	$chan_delete = $dbh->prepare("DELETE FROM chan WHERE chan=?");
-	$get_chanmodes = $dbh->prepare("SELECT modes FROM chan WHERE chan=?");
-	$set_chanmodes = $dbh->prepare("REPLACE INTO chan SET modes=?, chan=?");
+	$chan_create = undef; #$dbh->prepare("INSERT IGNORE INTO chan SET seq=?, chan=?");
+	$chan_delete = undef; #$dbh->prepare("DELETE FROM chan WHERE chan=?");
+	$get_chanmodes = undef; #$dbh->prepare("SELECT modes FROM chan WHERE chan=?");
+	$set_chanmodes = undef; #$dbh->prepare("REPLACE INTO chan SET modes=?, chan=?");
 
-	$is_registered = $dbh->prepare("SELECT 1 FROM chanreg WHERE chan=?");
-	$get_modelock = $dbh->prepare("SELECT modelock FROM chanreg WHERE chan=?");
-	$set_modelock = $dbh->prepare("UPDATE chanreg SET modelock=? WHERE chan=?");
+	$is_registered = undef; #$dbh->prepare("SELECT 1 FROM chanreg WHERE chan=?");
+	$get_modelock = undef; #$dbh->prepare("SELECT modelock FROM chanreg WHERE chan=?");
+	$set_modelock = undef; #$dbh->prepare("UPDATE chanreg SET modelock=? WHERE chan=?");
 
-	$set_descrip = $dbh->prepare("UPDATE chanreg SET descrip=? WHERE chan=?");
+	$set_descrip = undef; #$dbh->prepare("UPDATE chanreg SET descrip=? WHERE chan=?");
 
-	$get_topic = $dbh->prepare("SELECT chantext.data, topicer, topicd FROM chanreg, chantext
-		WHERE chanreg.chan=chantext.chan AND chantext.chan=?");
-	$set_topic1 = $dbh->prepare("UPDATE chanreg SET chanreg.topicer=?, chanreg.topicd=?
-		WHERE chanreg.chan=?");
-	$set_topic2 = $dbh->prepare("REPLACE INTO chantext SET chan=?, type=".CRT_TOPIC().", data=?");
+	$get_topic = undef; #$dbh->prepare("SELECT chantext.data, topicer, topicd FROM chanreg, chantext
+	#	WHERE chanreg.chan=chantext.chan AND chantext.chan=?");
+	$set_topic1 = undef; #$dbh->prepare("UPDATE chanreg SET chanreg.topicer=?, chanreg.topicd=?
+	#	WHERE chanreg.chan=?");
+	$set_topic2 = undef; #$dbh->prepare("REPLACE INTO chantext SET chan=?, type=".CRT_TOPIC().", data=?");
 
-	$get_acc = $dbh->prepare("SELECT chanacc.level FROM chanacc, nickalias
-		WHERE chanacc.chan=? AND chanacc.nrid=nickalias.nrid AND nickalias.alias=?");
-	$set_acc1 = $dbh->prepare("INSERT IGNORE INTO chanacc SELECT ?, nrid, ?, NULL, UNIX_TIMESTAMP(), 0
-		FROM nickalias WHERE alias=?");
-	$set_acc2 = $dbh->prepare("UPDATE chanacc, nickalias
-		SET chanacc.level=?, chanacc.adder=?, chanacc.time=UNIX_TIMESTAMP()
-		WHERE chanacc.chan=? AND chanacc.nrid=nickalias.nrid AND nickalias.alias=?");
-	$del_acc = $dbh->prepare("DELETE FROM chanacc USING chanacc, nickalias
-		WHERE chanacc.chan=? AND chanacc.nrid=nickalias.nrid AND nickalias.alias=?");
-	$wipe_acc_list = $dbh->prepare("DELETE FROM chanacc WHERE chan=? AND level=?");
-	$get_acc_list = $dbh->prepare("SELECT nickreg.nick, chanacc.adder, chanacc.time,
-		chanacc.last, nickreg.ident, nickreg.vhost
-		FROM chanacc, nickreg
-		WHERE chanacc.chan=? AND chanacc.level=? AND chanacc.nrid=nickreg.id AND chanacc.level > 0 ORDER BY nickreg.nick");
-	$get_acc_list2 = $dbh->prepare("SELECT nickreg.nick, chanacc.adder, chanacc.level, chanacc.time,
-		chanacc.last, nickreg.ident, nickreg.vhost
-		FROM chanacc, nickreg
-		WHERE chanacc.chan=? AND chanacc.nrid=nickreg.id AND chanacc.level > 0 ORDER BY nickreg.nick");
-	$get_acc_list_mask = $dbh->prepare("SELECT IF (nickreg.nick LIKE ?, nickreg.nick, nickalias.alias), chanacc.adder, chanacc.time,
-		chanacc.last, nickreg.ident, nickreg.vhost, COUNT(nickreg.id) as c
-		FROM chanacc, nickalias, nickreg
-		WHERE chanacc.chan=? AND chanacc.level=? AND chanacc.nrid=nickalias.nrid AND nickreg.id=nickalias.nrid
-		AND chanacc.level > 0
-		AND nickalias.alias LIKE ? AND nickreg.ident LIKE ? AND nickreg.vhost LIKE ?
-		GROUP BY nickreg.id
-		ORDER BY nickalias.alias");
-	$get_acc_list2_mask = $dbh->prepare("SELECT IF (nickreg.nick LIKE ?, nickreg.nick, nickalias.alias),
-		chanacc.adder, chanacc.level, chanacc.time,
-		chanacc.last, nickreg.ident, nickreg.vhost, COUNT(nickreg.id) as c
-		FROM chanacc, nickalias, nickreg
-		WHERE chanacc.chan=? AND chanacc.nrid=nickalias.nrid AND nickreg.id=nickalias.nrid
-		AND chanacc.level > 0
-		AND nickalias.alias LIKE ? AND nickreg.ident LIKE ? AND nickreg.vhost LIKE ?
-		GROUP BY nickreg.id
-		ORDER BY nickalias.alias");
+	$get_acc = undef; #$dbh->prepare("SELECT chanacc.level FROM chanacc, nickalias
+	#	WHERE chanacc.chan=? AND chanacc.nrid=nickalias.nrid AND nickalias.alias=?");
+	$set_acc1 = undef; #$dbh->prepare("INSERT IGNORE INTO chanacc SELECT ?, nrid, ?, NULL, UNIX_TIMESTAMP(), 0
+	#	FROM nickalias WHERE alias=?");
+	$set_acc2 = undef; #$dbh->prepare("UPDATE chanacc, nickalias
+	#	SET chanacc.level=?, chanacc.adder=?, chanacc.time=UNIX_TIMESTAMP()
+	#	WHERE chanacc.chan=? AND chanacc.nrid=nickalias.nrid AND nickalias.alias=?");
+	$del_acc = undef; #$dbh->prepare("DELETE FROM chanacc USING chanacc, nickalias
+	#	WHERE chanacc.chan=? AND chanacc.nrid=nickalias.nrid AND nickalias.alias=?");
+	$wipe_acc_list = undef; #$dbh->prepare("DELETE FROM chanacc WHERE chan=? AND level=?");
+	$get_acc_list = undef; #$dbh->prepare("SELECT nickreg.nick, chanacc.adder, chanacc.time,
+	#	chanacc.last, nickreg.ident, nickreg.vhost
+	#	FROM chanacc, nickreg
+	#	WHERE chanacc.chan=? AND chanacc.level=? AND chanacc.nrid=nickreg.id AND chanacc.level > 0 ORDER BY nickreg.nick");
+	$get_acc_list2 = undef; #$dbh->prepare("SELECT nickreg.nick, chanacc.adder, chanacc.level, chanacc.time,
+	#	chanacc.last, nickreg.ident, nickreg.vhost
+	#	FROM chanacc, nickreg
+	#	WHERE chanacc.chan=? AND chanacc.nrid=nickreg.id AND chanacc.level > 0 ORDER BY nickreg.nick");
+	$get_acc_list_mask = undef; #$dbh->prepare("SELECT IF (nickreg.nick LIKE ?, nickreg.nick, nickalias.alias), chanacc.adder, chanacc.time,
+	#	chanacc.last, nickreg.ident, nickreg.vhost, COUNT(nickreg.id) as c
+	#	FROM chanacc, nickalias, nickreg
+	#	WHERE chanacc.chan=? AND chanacc.level=? AND chanacc.nrid=nickalias.nrid AND nickreg.id=nickalias.nrid
+	#	AND chanacc.level > 0
+	#	AND nickalias.alias LIKE ? AND nickreg.ident LIKE ? AND nickreg.vhost LIKE ?
+	#	GROUP BY nickreg.id
+	#	ORDER BY nickalias.alias");
+	$get_acc_list2_mask = undef; #$dbh->prepare("SELECT IF (nickreg.nick LIKE ?, nickreg.nick, nickalias.alias),
+	#	chanacc.adder, chanacc.level, chanacc.time,
+	#	chanacc.last, nickreg.ident, nickreg.vhost, COUNT(nickreg.id) as c
+	#	FROM chanacc, nickalias, nickreg
+	#	WHERE chanacc.chan=? AND chanacc.nrid=nickalias.nrid AND nickreg.id=nickalias.nrid
+	#	AND chanacc.level > 0
+	#	AND nickalias.alias LIKE ? AND nickreg.ident LIKE ? AND nickreg.vhost LIKE ?
+	#	GROUP BY nickreg.id
+	#	ORDER BY nickalias.alias");
 
-	$get_best_acc = $dbh->prepare("SELECT nickreg.nick, chanacc.level
-		FROM nickid, nickalias, nickreg, chanacc 
-		WHERE nickid.nrid=nickreg.id AND nickalias.nrid=nickreg.id AND nickid.id=?
-		AND chanacc.nrid=nickreg.id AND chanacc.chan=? ORDER BY chanacc.level DESC LIMIT 1");
-	$get_all_acc = $dbh->prepare("SELECT nickreg.nick, chanacc.level
-		FROM nickid, nickreg, chanacc
-		WHERE nickid.nrid=nickreg.id AND nickid.id=? AND chanacc.nrid=nickreg.id
-		AND chanacc.chan=? ORDER BY chanacc.level");
-	$get_highrank = $dbh->prepare("SELECT user.nick, chanacc.level FROM chanuser, nickid, chanacc, user WHERE chanuser.chan=? AND chanuser.joined=1 AND chanuser.chan=chanacc.chan AND chanuser.nickid=nickid.id AND user.id=nickid.id AND nickid.nrid=chanacc.nrid ORDER BY chanacc.level DESC LIMIT 1");
-	$get_acc_count = $dbh->prepare("SELECT COUNT(*) FROM chanacc WHERE chan=? AND level=?");
-	$copy_acc = $dbh->prepare("REPLACE INTO chanacc
-		(   chan, nrid, level, adder, time)
- 		SELECT ?, nrid, level, adder, time FROM chanacc JOIN nickreg ON (chanacc.nrid=nickreg.id)
-		WHERE chan=? AND nickreg.nick!=? AND chanacc.level!=7");
-	$copy_acc_rank = $dbh->prepare("REPLACE INTO chanacc
-		(   chan, nrid, level, adder, time)
- 		SELECT ?, nrid, level, adder, time FROM chanacc
-		WHERE chan=? AND chanacc.level=?");
+	$get_best_acc = undef; #$dbh->prepare("SELECT nickreg.nick, chanacc.level
+	#	FROM nickid, nickalias, nickreg, chanacc 
+	#	WHERE nickid.nrid=nickreg.id AND nickalias.nrid=nickreg.id AND nickid.id=?
+	#	AND chanacc.nrid=nickreg.id AND chanacc.chan=? ORDER BY chanacc.level DESC LIMIT 1");
+	$get_all_acc = undef; #$dbh->prepare("SELECT nickreg.nick, chanacc.level
+	#	FROM nickid, nickreg, chanacc
+	#	WHERE nickid.nrid=nickreg.id AND nickid.id=? AND chanacc.nrid=nickreg.id
+	#	AND chanacc.chan=? ORDER BY chanacc.level");
+	$get_highrank = undef; #$dbh->prepare("SELECT user.nick, chanacc.level FROM chanuser, nickid, chanacc, user WHERE chanuser.chan=? AND chanuser.joined=1 AND chanuser.chan=chanacc.chan AND chanuser.nickid=nickid.id AND user.id=nickid.id AND nickid.nrid=chanacc.nrid ORDER BY chanacc.level DESC LIMIT 1");
+	$get_acc_count = undef; #$dbh->prepare("SELECT COUNT(*) FROM chanacc WHERE chan=? AND level=?");
+	$copy_acc = undef; #$dbh->prepare("REPLACE INTO chanacc
+	#	(   chan, nrid, level, adder, time)
+ 	#	SELECT ?, nrid, level, adder, time FROM chanacc JOIN nickreg ON (chanacc.nrid=nickreg.id)
+	#	WHERE chan=? AND nickreg.nick!=? AND chanacc.level!=7");
+	$copy_acc_rank = undef; #$dbh->prepare("REPLACE INTO chanacc
+	#	(   chan, nrid, level, adder, time)
+ 	#	SELECT ?, nrid, level, adder, time FROM chanacc
+	#	WHERE chan=? AND chanacc.level=?");
 
-	$get_eos_lock = $dbh->prepare("LOCK TABLES akick READ LOCAL, welcome READ LOCAL, chanuser WRITE, user WRITE,
-		user AS u1 READ, user AS u2 READ, chan WRITE, chanreg WRITE, nickid READ LOCAL, nickreg READ LOCAL,
-		nickalias READ LOCAL, chanacc READ LOCAL, chanban WRITE, svsop READ");
-	my $get_status_all_1 = "SELECT chanuser.chan, chanreg.flags, chanreg.bot, user.nick, user.id, user.flags, MAX(chanacc.level), chanuser.op, MAX(nickreg.flags & ".NRF_NEVEROP().")
-		FROM user, chanreg, chanuser
-		LEFT JOIN nickid ON(nickid.id=chanuser.nickid)
-		LEFT JOIN nickreg ON(nickid.nrid=nickreg.id)
-		LEFT JOIN chanacc ON(chanacc.chan=chanuser.chan AND chanacc.nrid=nickid.nrid AND (nickreg.flags & ".NRF_NEVEROP().")=0)
-		WHERE";
-	my $get_status_all_2 = "(user.flags & ".UF_FINISHED().")=0 AND chanuser.joined=1 AND (chanreg.flags & ".(CRF_CLOSE|CRF_DRONE).") = 0 AND chanreg.chan=chanuser.chan AND user.id=chanuser.nickid AND (nickid.nrid IS NULL OR nickreg.id IS NOT NULL)
-		GROUP BY chanuser.chan, chanuser.nickid ORDER BY NULL";
-	$get_status_all = $dbh->prepare("$get_status_all_1 $get_status_all_2");
-	$get_status_all_server = $dbh->prepare("$get_status_all_1 user.server=? AND $get_status_all_2");
+	$get_eos_lock = undef; #$dbh->prepare("LOCK TABLES akick READ LOCAL, welcome READ LOCAL, chanuser WRITE, user WRITE,
+		#user AS u1 READ, user AS u2 READ, chan WRITE, chanreg WRITE, nickid READ LOCAL, nickreg READ LOCAL,
+		#nickalias READ LOCAL, chanacc READ LOCAL, chanban WRITE, svsop READ");
+	my $get_status_all_1 = undef; #"SELECT chanuser.chan, chanreg.flags, chanreg.bot, user.nick, user.id, user.flags, MAX(chanacc.level), chanuser.op, MAX(nickreg.flags & ".NRF_NEVEROP().")
+	#	FROM user, chanreg, chanuser
+#		LEFT JOIN nickid ON(nickid.id=chanuser.nickid)
+	#	LEFT JOIN nickreg ON(nickid.nrid=nickreg.id)
+#		LEFT JOIN chanacc ON(chanacc.chan=chanuser.chan AND chanacc.nrid=nickid.nrid AND (nickreg.flags & ".NRF_NEVEROP().")=0)
+	#	WHERE";
+	my $get_status_all_2 = undef; #"(user.flags & ".UF_FINISHED().")=0 AND chanuser.joined=1 AND (chanreg.flags & ".(CRF_CLOSE|CRF_DRONE).") = 0 AND chanreg.chan=chanuser.chan AND user.id=chanuser.nickid AND (nickid.nrid IS NULL OR nickreg.id IS NOT NULL)
+		#GROUP BY chanuser.chan, chanuser.nickid ORDER BY NULL";
+	$get_status_all = undef; #$dbh->prepare("$get_status_all_1 $get_status_all_2");
+	$get_status_all_server = undef; #$dbh->prepare("$get_status_all_1 user.server=? AND $get_status_all_2");
 
-	$get_modelock_all = $dbh->prepare("SELECT chanuser.chan, chan.modes, chanreg.modelock FROM chanreg, chan, chanuser WHERE chanuser.joined=1 AND chanreg.chan=chan.chan AND chanreg.chan=chanuser.chan GROUP BY chanreg.chan ORDER BY NULL");
+	$get_modelock_all = undef; #$dbh->prepare("SELECT chanuser.chan, chan.modes, chanreg.modelock FROM chanreg, chan, chanuser WHERE chanuser.joined=1 AND chanreg.chan=chan.chan AND chanreg.chan=chanuser.chan GROUP BY chanreg.chan ORDER BY NULL");
 
-	my $akick_rows = "user.nick, akick.nick, akick.ident, akick.host, akick.reason";
-	my $akick_no_zerolen = "(akick.ident != '' AND akick.host != '')";
-	my $akick_single_cond = "$akick_no_zerolen AND user.nick LIKE akick.nick AND user.ident LIKE akick.ident ".
-		"AND ( (user.host LIKE akick.host) OR (user.vhost LIKE akick.host) OR ".
-		"(IF((user.ip IS NOT NULL) AND (user.ip != 0), INET_NTOA(user.ip) LIKE akick.host, 0)) OR ".
-		"(IF(user.cloakhost IS NOT NULL, user.cloakhost LIKE akick.host, 0)) )";
-	my $akick_multi_cond = "chanuser.chan=akick.chan AND $akick_single_cond";
+	my $akick_rows = undef; #"user.nick, akick.nick, akick.ident, akick.host, akick.reason";
+	my $akick_no_zerolen = undef; #"(akick.ident != '' AND akick.host != '')";
+	my $akick_single_cond = undef; #"$akick_no_zerolen AND user.nick LIKE akick.nick AND user.ident LIKE akick.ident ".
+	#	"AND ( (user.host LIKE akick.host) OR (user.vhost LIKE akick.host) OR ".
+	#	"(IF((user.ip IS NOT NULL) AND (user.ip != 0), INET_NTOA(user.ip) LIKE akick.host, 0)) OR ".
+	#	"(IF(user.cloakhost IS NOT NULL, user.cloakhost LIKE akick.host, 0)) )";
+	my $akick_multi_cond = undef; #"chanuser.chan=akick.chan AND $akick_single_cond";
 
-	$get_akick = $dbh->prepare("SELECT $akick_rows FROM akick, user ".
-		"WHERE user.id=? AND akick.chan=? AND $akick_single_cond LIMIT 1");
-	$get_akick_allchan = $dbh->prepare("SELECT $akick_rows FROM $chan_users_noacc_tables
-		JOIN akick ON($akick_multi_cond)
-		WHERE akick.chan=?
-		GROUP BY user.id HAVING MAX(IF(chanacc.level IS NULL, 0, chanacc.level)) <= 0
-		ORDER BY NULL");
-	$get_akick_alluser = $dbh->prepare("SELECT akick.chan, $akick_rows FROM $chan_users_noacc_tables
-		JOIN akick ON($akick_multi_cond)
-		WHERE chanuser.nickid=?
-		GROUP BY user.id HAVING MAX(IF(chanacc.level IS NULL, 0, chanacc.level)) <= 0
-		ORDER BY NULL");
-	$get_akick_all = $dbh->prepare("SELECT akick.chan, $akick_rows FROM $chan_users_noacc_tables
-		JOIN akick ON($akick_multi_cond)
-		GROUP BY akick.chan, user.id HAVING MAX(IF(chanacc.level IS NULL, 0, chanacc.level)) <= 0
-		ORDER BY NULL");
+	$get_akick = undef; #$dbh->prepare("SELECT $akick_rows FROM akick, user ".
+	#	"WHERE user.id=? AND akick.chan=? AND $akick_single_cond LIMIT 1");
+	$get_akick_allchan = undef; #$dbh->prepare("SELECT $akick_rows FROM $chan_users_noacc_tables
+	#	JOIN akick ON($akick_multi_cond)
+	#	WHERE akick.chan=?
+	#	GROUP BY user.id HAVING MAX(IF(chanacc.level IS NULL, 0, chanacc.level)) <= 0
+	#	ORDER BY NULL");
+	$get_akick_alluser = undef; #$dbh->prepare("SELECT akick.chan, $akick_rows FROM $chan_users_noacc_tables
+	#	JOIN akick ON($akick_multi_cond)
+	#	WHERE chanuser.nickid=?
+	#	GROUP BY user.id HAVING MAX(IF(chanacc.level IS NULL, 0, chanacc.level)) <= 0
+	#	ORDER BY NULL");
+	$get_akick_all = undef; #$dbh->prepare("SELECT akick.chan, $akick_rows FROM $chan_users_noacc_tables
+	#	JOIN akick ON($akick_multi_cond)
+	#	GROUP BY akick.chan, user.id HAVING MAX(IF(chanacc.level IS NULL, 0, chanacc.level)) <= 0
+	#	ORDER BY NULL");
 	
-	$add_akick = $dbh->prepare("INSERT INTO akick SET chan=?, nick=?, ident=?, host=?, adder=?, reason=?, time=UNIX_TIMESTAMP()");
+	$add_akick = undef; #$dbh->prepare("INSERT INTO akick SET chan=?, nick=?, ident=?, host=?, adder=?, reason=?, time=UNIX_TIMESTAMP()");
 	$add_akick->{PrintError} = 0;
-	$del_akick = $dbh->prepare("DELETE FROM akick WHERE chan=? AND nick=? AND ident=? AND host=?");
-	$get_akick_list = $dbh->prepare("SELECT nick, ident, host, adder, reason, time FROM akick WHERE chan=? ORDER BY time");
+	$del_akick = undef; #$dbh->prepare("DELETE FROM akick WHERE chan=? AND nick=? AND ident=? AND host=?");
+	$get_akick_list = undef; #$dbh->prepare("SELECT nick, ident, host, adder, reason, time FROM akick WHERE chan=? ORDER BY time");
 
-	$add_nick_akick = $dbh->prepare("INSERT INTO akick SELECT ?, nickalias.nrid, '', '', ?, ?, UNIX_TIMESTAMP()
-		FROM nickalias WHERE alias=?");
-	$del_nick_akick = $dbh->prepare("DELETE FROM akick USING akick, nickalias
-		WHERE akick.chan=? AND akick.nick=nickalias.nrid AND akick.ident='' AND akick.host='' AND nickalias.alias=?");
-	$get_nick_akick = $dbh->prepare("SELECT reason FROM akick, nickalias
-		WHERE akick.chan=? AND akick.nick=nickalias.nrid AND akick.ident='' AND akick.host='' AND nickalias.alias=?");
-	$drop_nick_akick = $dbh->prepare("DELETE FROM akick USING akick, nickreg
-		WHERE akick.nick=nickreg.id AND akick.ident='' AND akick.host='' AND nickreg.nick=?");
-	$copy_akick = $dbh->prepare("REPLACE INTO akick
-		(   chan, nick, ident, host, adder, reason, time)
-		SELECT ?, nick, ident, host, adder, reason, time FROM akick WHERE chan=?");
-	$get_akick_by_num = $dbh->prepare("SELECT akick.nick, akick.ident, akick.host FROM akick WHERE chan=?
-		ORDER BY time LIMIT 1 OFFSET ?");
-	$get_akick_by_num->bind_param(2, 0, SQL_INTEGER);
+	$add_nick_akick = undef; #$dbh->prepare("INSERT INTO akick SELECT ?, nickalias.nrid, '', '', ?, ?, UNIX_TIMESTAMP()
+	#	FROM nickalias WHERE alias=?");
+	$del_nick_akick = undef; #$dbh->prepare("DELETE FROM akick USING akick, nickalias
+	#	WHERE akick.chan=? AND akick.nick=nickalias.nrid AND akick.ident='' AND akick.host='' AND nickalias.alias=?");
+	$get_nick_akick = undef; #$dbh->prepare("SELECT reason FROM akick, nickalias
+	#	WHERE akick.chan=? AND akick.nick=nickalias.nrid AND akick.ident='' AND akick.host='' AND nickalias.alias=?");
+	$drop_nick_akick = undef; #$dbh->prepare("DELETE FROM akick USING akick, nickreg
+	#	WHERE akick.nick=nickreg.id AND akick.ident='' AND akick.host='' AND nickreg.nick=?");
+	$copy_akick = undef; #$dbh->prepare("REPLACE INTO akick
+	#	(   chan, nick, ident, host, adder, reason, time)
+	#	SELECT ?, nick, ident, host, adder, reason, time FROM akick WHERE chan=?");
+	$get_akick_by_num = undef; #$dbh->prepare("SELECT akick.nick, akick.ident, akick.host FROM akick WHERE chan=?
+	#	ORDER BY time LIMIT 1 OFFSET ?");
+	#$get_akick_by_num->bind_param(2, 0, SQL_INTEGER);
 
-	$is_level = $dbh->prepare("SELECT 1 FROM chanperm WHERE chanperm.name=?");
-	$get_level = $dbh->prepare("SELECT IF(chanlvl.level IS NULL, chanperm.level, chanlvl.level), chanlvl.level
-		FROM chanperm LEFT JOIN chanlvl ON chanlvl.perm=chanperm.id AND chanlvl.chan=?
-		WHERE chanperm.name=?");
-	$get_levels = $dbh->prepare("SELECT chanperm.name, chanperm.level, chanlvl.level FROM chanperm LEFT JOIN chanlvl ON chanlvl.perm=chanperm.id AND chanlvl.chan=? ORDER BY chanperm.name");
-	$add_level = $dbh->prepare("INSERT IGNORE INTO chanlvl SELECT ?, chanperm.id, chanperm.level FROM chanperm WHERE chanperm.name=?");
-	$set_level = $dbh->prepare("UPDATE chanlvl, chanperm SET chanlvl.level=? WHERE chanlvl.chan=? AND chanperm.id=chanlvl.perm AND chanperm.name=?");
-	$reset_level = $dbh->prepare("DELETE FROM chanlvl USING chanlvl, chanperm WHERE chanperm.name=? AND chanlvl.perm=chanperm.id AND chanlvl.chan=?");
-	$clear_levels = $dbh->prepare("DELETE FROM chanlvl WHERE chan=?");
-	$get_level_max = $dbh->prepare("SELECT max FROM chanperm WHERE name=?");
-	$copy_levels = $dbh->prepare("REPLACE INTO chanlvl
-		(   chan, perm, level)
-		SELECT ?, perm, level FROM chanlvl WHERE chan=?");
+	$is_level = undef; #$dbh->prepare("SELECT 1 FROM chanperm WHERE chanperm.name=?");
+	$get_level = undef; #$dbh->prepare("SELECT IF(chanlvl.level IS NULL, chanperm.level, chanlvl.level), chanlvl.level
+	#	FROM chanperm LEFT JOIN chanlvl ON chanlvl.perm=chanperm.id AND chanlvl.chan=?
+	#	WHERE chanperm.name=?");
+	$get_levels = undef; #$dbh->prepare("SELECT chanperm.name, chanperm.level, chanlvl.level FROM chanperm LEFT JOIN chanlvl ON chanlvl.perm=chanperm.id AND chanlvl.chan=? ORDER BY chanperm.name");
+	$add_level = undef; #$dbh->prepare("INSERT IGNORE INTO chanlvl SELECT ?, chanperm.id, chanperm.level FROM chanperm WHERE chanperm.name=?");
+	$set_level = undef; #$dbh->prepare("UPDATE chanlvl, chanperm SET chanlvl.level=? WHERE chanlvl.chan=? AND chanperm.id=chanlvl.perm AND chanperm.name=?");
+	$reset_level = undef; #$dbh->prepare("DELETE FROM chanlvl USING chanlvl, chanperm WHERE chanperm.name=? AND chanlvl.perm=chanperm.id AND chanlvl.chan=?");
+	$clear_levels = undef; #$dbh->prepare("DELETE FROM chanlvl WHERE chan=?");
+	$get_level_max = undef; #$dbh->prepare("SELECT max FROM chanperm WHERE name=?");
+	$copy_levels = undef; #$dbh->prepare("REPLACE INTO chanlvl
+	#	(   chan, perm, level)
+	#	SELECT ?, perm, level FROM chanlvl WHERE chan=?");
 
-	$get_founder = $dbh->prepare("SELECT nickreg.nick FROM chanreg, nickreg WHERE chanreg.chan=? AND chanreg.founderid=nickreg.id");
-	$get_successor = $dbh->prepare("SELECT nickreg.nick FROM chanreg, nickreg WHERE chanreg.chan=? AND chanreg.successorid=nickreg.id");
-	$set_founder = $dbh->prepare("UPDATE chanreg, nickreg SET chanreg.founderid=nickreg.id WHERE nickreg.nick=? AND chanreg.chan=?");
-	$set_successor = $dbh->prepare("UPDATE chanreg, nickreg SET chanreg.successorid=nickreg.id WHERE nickreg.nick=? AND chanreg.chan=?");
-	$del_successor = $dbh->prepare("UPDATE chanreg SET chanreg.successorid=NULL WHERE chanreg.chan=?");
+	$get_founder = undef; #$dbh->prepare("SELECT nickreg.nick FROM chanreg, nickreg WHERE chanreg.chan=? AND chanreg.founderid=nickreg.id");
+	$get_successor = undef; #$dbh->prepare("SELECT nickreg.nick FROM chanreg, nickreg WHERE chanreg.chan=? AND chanreg.successorid=nickreg.id");
+	$set_founder = undef; #$dbh->prepare("UPDATE chanreg, nickreg SET chanreg.founderid=nickreg.id WHERE nickreg.nick=? AND chanreg.chan=?");
+	$set_successor = undef; #$dbh->prepare("UPDATE chanreg, nickreg SET chanreg.successorid=nickreg.id WHERE nickreg.nick=? AND chanreg.chan=?");
+	$del_successor = undef; #$dbh->prepare("UPDATE chanreg SET chanreg.successorid=NULL WHERE chanreg.chan=?");
 
-	$get_nick_own_chans = $dbh->prepare("SELECT chanreg.chan FROM chanreg, nickreg WHERE nickreg.nick=? AND chanreg.founderid=nickreg.id");
-	$delete_successors = $dbh->prepare("UPDATE chanreg, nickreg SET chanreg.successorid=NULL WHERE nickreg.nick=? AND chanreg.successorid=nickreg.id");
+	$get_nick_own_chans = undef; #$dbh->prepare("SELECT chanreg.chan FROM chanreg, nickreg WHERE nickreg.nick=? AND chanreg.founderid=nickreg.id");
+	$delete_successors = undef; #$dbh->prepare("UPDATE chanreg, nickreg SET chanreg.successorid=NULL WHERE nickreg.nick=? AND chanreg.successorid=nickreg.id");
 
-	$set_lastop = $dbh->prepare("UPDATE chanreg SET last=UNIX_TIMESTAMP() WHERE chan=?");
-	$set_lastused = $dbh->prepare("UPDATE chanacc, nickid SET chanacc.last=UNIX_TIMESTAMP() WHERE 
-		chanacc.chan=? AND nickid.id=? AND chanacc.nrid=nickid.nrid AND chanacc.level > 0");
+	$set_lastop = undef; #$dbh->prepare("UPDATE chanreg SET last=UNIX_TIMESTAMP() WHERE chan=?");
+	$set_lastused = undef; #$dbh->prepare("UPDATE chanacc, nickid SET chanacc.last=UNIX_TIMESTAMP() WHERE 
+	#	chanacc.chan=? AND nickid.id=? AND chanacc.nrid=nickid.nrid AND chanacc.level > 0");
 
-	$get_info = $dbh->prepare("SELECT chanreg.descrip, chanreg.regd, chanreg.last, chantext.data, 
-		chanreg.topicer, chanreg.modelock, foundernick.nick, successornick.nick, chanreg.bot, chanreg.bantype
-		FROM nickreg AS foundernick, chanreg
-		LEFT JOIN nickreg AS successornick ON(successornick.id=chanreg.successorid)
-		LEFT JOIN chantext ON (chanreg.chan=chantext.chan AND chantext.type=".CRT_TOPIC().")
-		WHERE chanreg.chan=? AND foundernick.id=chanreg.founderid");
+	$get_info = undef; #$dbh->prepare("SELECT chanreg.descrip, chanreg.regd, chanreg.last, chantext.data, 
+	#	chanreg.topicer, chanreg.modelock, foundernick.nick, successornick.nick, chanreg.bot, chanreg.bantype
+	#	FROM nickreg AS foundernick, chanreg
+	#	LEFT JOIN nickreg AS successornick ON(successornick.id=chanreg.successorid)
+	#	LEFT JOIN chantext ON (chanreg.chan=chantext.chan AND chantext.type=".CRT_TOPIC().")
+	#	WHERE chanreg.chan=? AND foundernick.id=chanreg.founderid");
 
-	$register = $dbh->prepare("INSERT INTO chanreg
-		SELECT ?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), NULL, NULL,
-		NULL, id, NULL, NULL, NULL, ".DEFAULT_BANTYPE()." FROM nickreg WHERE nick=?");
+	$register = undef; #$dbh->prepare("INSERT INTO chanreg
+	#	SELECT ?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), NULL, NULL,
+	#	NULL, id, NULL, NULL, NULL, ".DEFAULT_BANTYPE()." FROM nickreg WHERE nick=?");
 	$register->{PrintError} = 0;
-	$copy_chanreg = $dbh->prepare("INSERT INTO chanreg
-		(      chan, descrip, regd,             last,             modelock, founderid, successorid, bot, flags, bantype)
-		SELECT ?,    descrip, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), modelock, founderid, successorid, bot, flags, bantype
-		FROM chanreg WHERE chan=?");
+	$copy_chanreg = undef; #$dbh->prepare("INSERT INTO chanreg
+	#	(      chan, descrip, regd,             last,             modelock, founderid, successorid, bot, flags, bantype)
+	#	SELECT ?,    descrip, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), modelock, founderid, successorid, bot, flags, bantype
+	#	FROM chanreg WHERE chan=?");
 
-	$drop_acc = $dbh->prepare("DELETE FROM chanacc WHERE chan=?");
-	$drop_lvl = $dbh->prepare("DELETE FROM chanlvl WHERE chan=?");
-	$drop_akick = $dbh->prepare("DELETE FROM akick WHERE chan=?");
-	$drop = $dbh->prepare("DELETE FROM chanreg WHERE chan=?");
+	$drop_acc = undef; #$dbh->prepare("DELETE FROM chanacc WHERE chan=?");
+	$drop_lvl = undef; #$dbh->prepare("DELETE FROM chanlvl WHERE chan=?");
+	$drop_akick = undef; #$dbh->prepare("DELETE FROM akick WHERE chan=?");
+	$drop = undef; #$dbh->prepare("DELETE FROM chanreg WHERE chan=?");
 
-	$get_expired = $dbh->prepare("SELECT chanreg.chan, nickreg.nick FROM nickreg, chanreg
-	    LEFT JOIN chanuser ON(chanreg.chan=chanuser.chan AND chanuser.op!=0)
-	    WHERE chanreg.founderid=nickreg.id AND chanuser.chan IS NULL AND chanreg.last<? AND
-	    !(chanreg.flags & " . CRF_HOLD . ")");
+	$get_expired = undef; #$dbh->prepare("SELECT chanreg.chan, nickreg.nick FROM nickreg, chanreg
+	 #   LEFT JOIN chanuser ON(chanreg.chan=chanuser.chan AND chanuser.op!=0)
+	  #  WHERE chanreg.founderid=nickreg.id AND chanuser.chan IS NULL AND chanreg.last<? AND
+	   # !(chanreg.flags & " . CRF_HOLD . ")");
 
-	$get_close = $dbh->prepare("SELECT reason, nick, time FROM chanclose WHERE chan=?");
-	$set_close = $dbh->prepare("REPLACE INTO chanclose SET chan=?, reason=?, nick=?, time=UNIX_TIMESTAMP(), type=?");
-	$del_close = $dbh->prepare("DELETE FROM chanclose WHERE chan=?");
+	$get_close = undef; #$dbh->prepare("SELECT reason, nick, time FROM chanclose WHERE chan=?");
+	$set_close = undef; #$dbh->prepare("REPLACE INTO chanclose SET chan=?, reason=?, nick=?, time=UNIX_TIMESTAMP(), type=?");
+	$del_close = undef; #$dbh->prepare("DELETE FROM chanclose WHERE chan=?");
 
-	$add_welcome = $dbh->prepare("REPLACE INTO welcome SET chan=?, id=?, adder=?, time=UNIX_TIMESTAMP(), msg=?");
-	$del_welcome = $dbh->prepare("DELETE FROM welcome WHERE chan=? AND id=?");
-	$list_welcome = $dbh->prepare("SELECT id, time, adder, msg FROM welcome WHERE chan=? ORDER BY id");
-	$get_welcomes = $dbh->prepare("SELECT msg FROM welcome WHERE chan=? ORDER BY id");
-	$drop_welcome = $dbh->prepare("DELETE FROM welcome WHERE chan=?");
-	$count_welcome = $dbh->prepare("SELECT COUNT(*) FROM welcome WHERE chan=?");
-	$consolidate_welcome = $dbh->prepare("UPDATE welcome SET id=id-1 WHERE chan=? AND id>?");
+	$add_welcome = undef; #$dbh->prepare("REPLACE INTO welcome SET chan=?, id=?, adder=?, time=UNIX_TIMESTAMP(), msg=?");
+	$del_welcome = undef; #$dbh->prepare("DELETE FROM welcome WHERE chan=? AND id=?");
+	$list_welcome = undef; #$dbh->prepare("SELECT id, time, adder, msg FROM welcome WHERE chan=? ORDER BY id");
+	$get_welcomes = undef; #$dbh->prepare("SELECT msg FROM welcome WHERE chan=? ORDER BY id");
+	$drop_welcome = undef; #$dbh->prepare("DELETE FROM welcome WHERE chan=?");
+	$count_welcome = undef; #$dbh->prepare("SELECT COUNT(*) FROM welcome WHERE chan=?");
+	$consolidate_welcome = undef; #$dbh->prepare("UPDATE welcome SET id=id-1 WHERE chan=? AND id>?");
 
-	$add_ban = $dbh->prepare("REPLACE INTO chanban SET chan=?, mask=?, setter=?, type=?, time=UNIX_TIMESTAMP()");
-	$delete_bans = $dbh->prepare("DELETE FROM chanban WHERE chan=? AND ? LIKE mask AND type=?");
+	$add_ban = undef; #$dbh->prepare("REPLACE INTO chanban SET chan=?, mask=?, setter=?, type=?, time=UNIX_TIMESTAMP()");
+	$delete_bans = undef; #$dbh->prepare("DELETE FROM chanban WHERE chan=? AND ? LIKE mask AND type=?");
 	# likely need a better name for this or for the above.
-	$delete_ban = $dbh->prepare("DELETE FROM chanban WHERE chan=? AND mask=? AND type=?");
-	$find_bans = $dbh->prepare("SELECT mask FROM chanban WHERE chan=? AND ? LIKE mask AND type=?");
-	$get_all_bans = $dbh->prepare("SELECT mask FROM chanban WHERE chan=? AND type=?");
-	$get_ban_num = $dbh->prepare("SELECT mask FROM chanban WHERE chan=? ORDER BY time, mask LIMIT 1 OFFSET ?");
-	$get_ban_num->bind_param(2, 0, SQL_INTEGER);
-	$list_bans = $dbh->prepare("SELECT mask, setter, time FROM chanban WHERE chan=? AND type=? ORDER BY time, mask");
-	$wipe_bans = $dbh->prepare("DELETE FROM chanban WHERE chan=?");
+	$delete_ban = undef; #$dbh->prepare("DELETE FROM chanban WHERE chan=? AND mask=? AND type=?");
+	$find_bans = undef; #$dbh->prepare("SELECT mask FROM chanban WHERE chan=? AND ? LIKE mask AND type=?");
+	$get_all_bans = undef; #$dbh->prepare("SELECT mask FROM chanban WHERE chan=? AND type=?");
+	$get_ban_num = undef; #$dbh->prepare("SELECT mask FROM chanban WHERE chan=? ORDER BY time, mask LIMIT 1 OFFSET ?");
+	#$get_ban_num->bind_param(2, 0, SQL_INTEGER);
+	$list_bans = undef; #$dbh->prepare("SELECT mask, setter, time FROM chanban WHERE chan=? AND type=? ORDER BY time, mask");
+	$wipe_bans = undef; #$dbh->prepare("DELETE FROM chanban WHERE chan=?");
 
-	my $chanban_mask = "((CONCAT(user.nick, '!', user.ident, '\@', user.host) LIKE chanban.mask) ".
-			"OR (CONCAT(user.nick , '!' , user.ident , '\@' , user.vhost) LIKE chanban.mask) ".
-			"OR IF(user.cloakhost IS NOT NULL, ".
-				"(CONCAT(user.nick , '!' , user.ident , '\@' , user.cloakhost) LIKE chanban.mask), 0))";
-	$find_bans_chan_user = $dbh->prepare("SELECT mask FROM chanban,user
-		WHERE chan=? AND user.id=? AND type=? AND $chanban_mask");
-	$delete_bans_chan_user = $dbh->prepare("DELETE FROM chanban USING chanban,user
-		WHERE chan=? AND user.id=? AND type=? AND $chanban_mask");
+	my $chanban_mask = undef; #"((CONCAT(user.nick, '!', user.ident, '\@', user.host) LIKE chanban.mask) ".
+	#		"OR (CONCAT(user.nick , '!' , user.ident , '\@' , user.vhost) LIKE chanban.mask) ".
+#			"OR IF(user.cloakhost IS NOT NULL, ".
+#				"(CONCAT(user.nick , '!' , user.ident , '\@' , user.cloakhost) LIKE chanban.mask), 0))";
+	$find_bans_chan_user = undef; #$dbh->prepare("SELECT mask FROM chanban,user
+#		WHERE chan=? AND user.id=? AND type=? AND $chanban_mask");
+	$delete_bans_chan_user = undef; #$dbh->prepare("DELETE FROM chanban USING chanban,user
+#		WHERE chan=? AND user.id=? AND type=? AND $chanban_mask");
 
-	$add_auth = $dbh->prepare("REPLACE INTO nicktext
-		SELECT nickalias.nrid, (".nickserv::NTF_AUTH()."), 1, ?, ? FROM nickalias WHERE nickalias.alias=?");
-	$list_auth_chan = $dbh->prepare("SELECT nickreg.nick, nicktext.data FROM nickreg, nicktext
-		WHERE nickreg.id=nicktext.nrid AND nicktext.type=(".nickserv::NTF_AUTH().") AND nicktext.chan=?");
-	$get_auth_nick = $dbh->prepare("SELECT nicktext.data FROM nickreg, nickalias, nicktext
-		WHERE nickreg.id=nicktext.nrid AND nickreg.id=nickalias.nrid AND nicktext.type=(".nickserv::NTF_AUTH().")
-		AND nicktext.chan=? AND nickalias.alias=?");
-	$get_auth_num = $dbh->prepare("SELECT nickreg.nick, nicktext.data FROM nickreg, nickalias, nicktext
-		WHERE nickreg.id=nicktext.nrid AND nickreg.id=nickalias.nrid AND nicktext.type=(".nickserv::NTF_AUTH().")
-		AND nicktext.chan=? LIMIT 1 OFFSET ?");
-	$get_auth_num->bind_param(2, 0, SQL_INTEGER);
-	$find_auth = $dbh->prepare("SELECT 1 FROM nickalias, nicktext
-		WHERE nickalias.nrid=nicktext.nrid AND nicktext.type=(".nickserv::NTF_AUTH().")
-		AND nicktext.chan=? AND nickalias.alias=?");
+	$add_auth = undef; #$dbh->prepare("REPLACE INTO nicktext
+#		SELECT nickalias.nrid, (".nickserv::NTF_AUTH()."), 1, ?, ? FROM nickalias WHERE nickalias.alias=?");
+	$list_auth_chan = undef; #$dbh->prepare("SELECT nickreg.nick, nicktext.data FROM nickreg, nicktext
+#		WHERE nickreg.id=nicktext.nrid AND nicktext.type=(".nickserv::NTF_AUTH().") AND nicktext.chan=?");
+	$get_auth_nick = undef; #$dbh->prepare("SELECT nicktext.data FROM nickreg, nickalias, nicktext
+	#	WHERE nickreg.id=nicktext.nrid AND nickreg.id=nickalias.nrid AND nicktext.type=(".nickserv::NTF_AUTH().")
+	#	AND nicktext.chan=? AND nickalias.alias=?");
+	$get_auth_num = undef; #$dbh->prepare("SELECT nickreg.nick, nicktext.data FROM nickreg, nickalias, nicktext
+	#	WHERE nickreg.id=nicktext.nrid AND nickreg.id=nickalias.nrid AND nicktext.type=(".nickserv::NTF_AUTH().")
+	#	AND nicktext.chan=? LIMIT 1 OFFSET ?");
+	#$get_auth_num->bind_param(2, 0, SQL_INTEGER);
+	$find_auth = undef; #$dbh->prepare("SELECT 1 FROM nickalias, nicktext
+	#	WHERE nickalias.nrid=nicktext.nrid AND nicktext.type=(".nickserv::NTF_AUTH().")
+	#	AND nicktext.chan=? AND nickalias.alias=?");
 
-	$set_bantype = $dbh->prepare("UPDATE chanreg SET bantype=? WHERE chan=?");
-	$get_bantype = $dbh->prepare("SELECT bantype FROM chanreg WHERE chan=?");
+	$set_bantype = undef; #$dbh->prepare("UPDATE chanreg SET bantype=? WHERE chan=?");
+	$get_bantype = undef; #$dbh->prepare("SELECT bantype FROM chanreg WHERE chan=?");
 
-	$drop_chantext = $dbh->prepare("DELETE FROM chantext WHERE chan=?");
-	$drop_nicktext = $dbh->prepare("DELETE nicktext.* FROM nicktext WHERE nicktext.chan=?");
+	$drop_chantext = undef; #$dbh->prepare("DELETE FROM chantext WHERE chan=?");
+	$drop_nicktext = undef; #$dbh->prepare("DELETE nicktext.* FROM nicktext WHERE nicktext.chan=?");
 
-	$get_recent_private_chans = $dbh->prepare("SELECT chanuser.chan FROM chanperm, chanlvl, chanuser, nickid, chanacc WHERE chanperm.name='Join' AND chanlvl.perm=chanperm.id AND chanlvl.level > 0 AND nickid.id=? AND chanacc.nrid=nickid.nrid AND chanuser.nickid=nickid.id AND chanuser.joined=0 AND chanuser.chan=chanacc.chan AND chanlvl.level <= chanacc.level");
+	$get_recent_private_chans = undef; #$dbh->prepare("SELECT chanuser.chan FROM chanperm, chanlvl, chanuser, nickid, chanacc WHERE chanperm.name='Join' AND chanlvl.perm=chanperm.id AND chanlvl.level > 0 AND nickid.id=? AND chanacc.nrid=nickid.nrid AND chanuser.nickid=nickid.id AND chanuser.joined=0 AND chanuser.chan=chanacc.chan AND chanlvl.level <= chanacc.level");
 }
 
 ### CHANSERV COMMANDS ###
@@ -3085,10 +3085,10 @@ sub cs_mlock($$$@) {
 =cut
 }
 
-use SrSv::MySQL::Stub {
-	getChanUsers => ['COLUMN', "SELECT user.nick FROM chanuser, user
-		WHERE chanuser.chan=? AND user.id=chanuser.nickid AND chanuser.joined=1"]
-};
+#use SrSv::MySQL::Stub {
+#	getChanUsers => ['COLUMN', "SELECT user.nick FROM chanuser, user
+#		WHERE chanuser.chan=? AND user.id=chanuser.nickid AND chanuser.joined=1"]
+#};
 
 sub cs_resync($@) {
 	my ($user, @cns) = @_;
@@ -3611,7 +3611,7 @@ sub get_lock($) {
 		$cnt_lock++;
 	} else {
 		$cur_lock = $chan;
-		$get_lock->execute(sql_conf_mysql_db.".chan.$chan");
+		#$get_lock->execute(sql_conf_mysql_db.".chan.$chan");
 		$get_lock->finish;
 	}	
 }
@@ -3640,7 +3640,7 @@ sub really_release_lock($) {
 	my ($chan) = @_;
 
 	$cnt_lock = 0;
-	$release_lock->execute(sql_conf_mysql_db.".chan.$chan");
+	#$release_lock->execute(sql_conf_mysql_db.".chan.$chan");
 	$release_lock->finish;
 	undef $cur_lock;
 }
@@ -4328,14 +4328,14 @@ sub user_join_multi($$) {
 		# I think this will be faster.
 			if (defined($user->{__ID})) {
 				# see note above in get_user_id loop
-				$query .= '('.$dbh->quote($seq).','.
-					$dbh->quote($user->{__ID}).','.
-					$dbh->quote($cn).','.
-					$dbh->quote($user->{__OP}).', 1),';
+				#$query .= '('.$dbh->quote($seq).','.
+				#	$dbh->quote($user->{__ID}).','.
+				#	$dbh->quote($cn).','.
+				#	$dbh->quote($user->{__OP}).', 1),';
 			}
 		}
 		$query =~ s/\,$//;
-		$dbh->do($query);
+		#$dbh->do($query);
 	}
 
 	$unlock_tables->execute; $unlock_tables->finish;

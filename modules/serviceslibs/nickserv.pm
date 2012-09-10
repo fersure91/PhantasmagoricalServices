@@ -17,17 +17,17 @@ package nickserv;
 
 use strict;
 use Time::Local;
-use DBI qw(:sql_types);
+#use DBI qw(:sql_types);
 
 use SrSv::Timer qw(add_timer);
 use SrSv::IRCd::State qw($ircline synced initial_synced %IRCd_capabilities);
 use SrSv::Agent;
-use SrSv::Conf qw(main services sql);
-use SrSv::Conf2Consts qw(main services sql);
+use SrSv::Conf qw(main services);
+use SrSv::Conf2Consts qw(main services);
 use SrSv::HostMask qw(normalize_hostmask hostmask_to_regexp parse_mask parse_hostmask make_hostmask);
 
-use SrSv::MySQL '$dbh';
-use SrSv::MySQL::Glob;
+#use SrSv::MySQL '$dbh';
+#use SrSv::MySQL::Glob;
 
 use SrSv::Shared qw(%newuser %olduser);
 
@@ -51,7 +51,7 @@ use SrSv::Email;
 
 use SrSv::Util qw( makeSeqList );
 
-require SrSv::MySQL::Stub;
+#require SrSv::MySQL::Stub;
 
 use constant {
 	# Clone exception max limit.
@@ -182,255 +182,256 @@ our (
 );
 
 sub init() {
-	$nick_check = $dbh->prepare("SELECT id FROM user WHERE nick=? AND online=0 AND time=?");
-	$nick_create = $dbh->prepare("INSERT INTO user SET nick=?, time=?, inval=0, ident=?, host=?, vhost=?, server=?, modes=?,
-		gecos=?, flags=?, cloakhost=?, online=1");
-#	$nick_create = $dbh->prepare("INSERT INTO user SET id=(RAND()*294967293)+1, nick=?, time=?, inval=0, ident=?, host=?, vhost=?, server=?, modes=?, gecos=?, flags=?, cloakhost=?, online=1");
-	$nick_create_old = $dbh->prepare("UPDATE user SET nick=?, ident=?, host=?, vhost=?, server=?, modes=?, gecos=?,
-		flags=?, cloakhost=?, online=1 WHERE id=?");
-	$nick_change = $dbh->prepare("UPDATE user SET nick=?, time=? WHERE nick=?");
-	$nick_quit = $dbh->prepare("UPDATE user SET online=0, quittime=UNIX_TIMESTAMP() WHERE nick=?");
-	$nick_delete = $dbh->prepare("DELETE FROM user WHERE nick=?");
-	$nick_id_delete = $dbh->prepare("DELETE FROM nickid WHERE id=?");
-	$get_quit_empty_chans = $dbh->prepare("SELECT cu2.chan, COUNT(*) AS c
-		FROM chanuser AS cu1, chanuser AS cu2
-		WHERE cu1.nickid=?
-		AND cu1.chan=cu2.chan AND cu1.joined=1 AND cu2.joined=1
-		GROUP BY cu2.chan HAVING c=1 ORDER BY NULL");
-	$nick_chan_delete = $dbh->prepare("DELETE FROM chanuser WHERE nickid=?");
-	$chan_user_partall = $dbh->prepare("UPDATE chanuser SET joined=0 WHERE nickid=?");
-	$get_hostless_nicks = $dbh->prepare("SELECT nick FROM user WHERE vhost='*'");
+	$nick_check = undef; #$dbh->prepare("SELECT id FROM user WHERE nick=? AND online=0 AND time=?");
+	$nick_create = undef; #$dbh->prepare("INSERT INTO user SET nick=?, time=?, inval=0, ident=?, host=?, vhost=?, server=?, modes=?,
+		#gecos=?, flags=?, cloakhost=?, online=1");
+	$nick_create = undef; #$dbh->prepare("INSERT INTO user SET id=(RAND()*294967293)+1, nick=?, time=?, inval=0, ident=?, host=?, vhost=?, server=?, modes=?, gecos=?, flags=?, cloakhost=?, online=1");
+	$nick_create_old = undef; #$dbh->prepare("UPDATE user SET nick=?, ident=?, host=?, vhost=?, server=?, modes=?, gecos=?,
+		#flags=?, cloakhost=?, online=1 WHERE id=?");
+	$nick_change = undef; #$dbh->prepare("UPDATE user SET nick=?, time=? WHERE nick=?");
+	$nick_quit = undef; #$dbh->prepare("UPDATE user SET online=0, quittime=UNIX_TIMESTAMP() WHERE nick=?");
+	$nick_delete = undef; #$dbh->prepare("DELETE FROM user WHERE nick=?");
+	$nick_id_delete = undef; #$dbh->prepare("DELETE FROM nickid WHERE id=?");
+	$get_quit_empty_chans = undef; #$dbh->prepare("SELECT cu2.chan, COUNT(*) AS c
+		#FROM chanuser AS cu1, chanuser AS cu2
+		#WHERE cu1.nickid=?
+		#AND cu1.chan=cu2.chan AND cu1.joined=1 AND cu2.joined=1
+		#GROUP BY cu2.chan HAVING c=1 ORDER BY NULL");
+	$nick_chan_delete = undef; #$dbh->prepare("DELETE FROM chanuser WHERE nickid=?");
+	$chan_user_partall = undef; #$dbh->prepare("UPDATE chanuser SET joined=0 WHERE nickid=?");
+	$get_hostless_nicks = undef; #$dbh->prepare("SELECT nick FROM user WHERE vhost='*'");
 
-	$get_squit_lock = $dbh->prepare("LOCK TABLES chanuser WRITE, chanuser AS cu1 READ LOCAL, chanuser AS cu2 READ LOCAL, user WRITE, nickreg WRITE, nickid WRITE, chanban WRITE, chan WRITE, chanreg READ LOCAL, nicktext WRITE");
-	$squit_users = $dbh->prepare("UPDATE chanuser, user
-		SET chanuser.joined=0, user.online=0, user.quittime=UNIX_TIMESTAMP()
-		WHERE user.id=chanuser.nickid AND user.server=?");
+	$get_squit_lock = undef; #$dbh->prepare("LOCK TABLES chanuser WRITE, chanuser AS cu1 READ LOCAL, chanuser AS cu2 READ LOCAL, user WRITE, nickreg WRITE, nickid WRITE, chanban WRITE, chan WRITE, chanreg READ LOCAL, nicktext WRITE");
+	$squit_users = undef; #$dbh->prepare("UPDATE chanuser, user
+		#SET chanuser.joined=0, user.online=0, user.quittime=UNIX_TIMESTAMP()
+		#WHERE user.id=chanuser.nickid AND user.server=?");
 	# Must call squit_nickreg and squit_lastquit before squit_users as it modifies user.online
-	$squit_nickreg = $dbh->prepare("UPDATE nickreg, nickid, user
-		SET nickreg.last=UNIX_TIMESTAMP()
-		WHERE nickreg.id=nickid.nrid AND nickid.id=user.id
-		AND user.online=1 AND user.server=?");
+	$squit_nickreg = undef; #$dbh->prepare("UPDATE nickreg, nickid, user
+		#SET nickreg.last=UNIX_TIMESTAMP()
+		#WHERE nickreg.id=nickid.nrid AND nickid.id=user.id
+		#AND user.online=1 AND user.server=?");
 =cut
 	$squit_lastquit = $dbh->prepare("UPDATE nickid, user, nicktext
 		SET nicktext.data=?
 		WHERE nicktext.nrid=nickid.nrid AND nickid.id=user.id
 		AND user.online=1 AND user.server=?");
 =cut
-	$squit_lastquit = $dbh->prepare("REPLACE INTO nicktext ".
-		"SELECT nickid.nrid, ".NTF_QUIT.", 0, '', ? ".
-		"FROM nickid JOIN user ON (nickid.id=user.id) ".
-		"WHERE user.online=1 AND user.server=?");
-	$get_squit_empty_chans = $dbh->prepare("SELECT cu2.chan, COUNT(*) AS c
-		FROM user, chanuser AS cu1, chanuser AS cu2
-		WHERE user.server=? AND cu1.nickid=user.id
-		AND cu1.chan=cu2.chan AND cu1.joined=1 AND cu2.joined=1
-		GROUP BY cu2.chan HAVING c=1 ORDER BY NULL");
+	$squit_lastquit = undef; #$dbh->prepare("REPLACE INTO nicktext ".
+		#"SELECT nickid.nrid, ".NTF_QUIT.", 0, '', ? ".
+		#"FROM nickid JOIN user ON (nickid.id=user.id) ".
+		#"WHERE user.online=1 AND user.server=?");
+	$get_squit_empty_chans = undef; #$dbh->prepare("SELECT cu2.chan, COUNT(*) AS c
+		#FROM user, chanuser AS cu1, chanuser AS cu2
+		#WHERE user.server=? AND cu1.nickid=user.id
+		#AND cu1.chan=cu2.chan AND cu1.joined=1 AND cu2.joined=1
+		#GROUP BY cu2.chan HAVING c=1 ORDER BY NULL");
 
-	$del_nickchg_id = $dbh->prepare("DELETE FROM nickchg WHERE nickid=?");
-	$add_nickchg = $dbh->prepare("REPLACE INTO nickchg SELECT ?, id, ? FROM user WHERE nick=?");
-	$reap_nickchg = $dbh->prepare("DELETE FROM nickchg WHERE seq<?");
+	$del_nickchg_id = undef; #$dbh->prepare("DELETE FROM nickchg WHERE nickid=?");
+	$add_nickchg = undef; #$dbh->prepare("REPLACE INTO nickchg SELECT ?, id, ? FROM user WHERE nick=?");
+	$reap_nickchg = undef; #$dbh->prepare("DELETE FROM nickchg WHERE seq<?");
 	
-	$get_nick_inval = $dbh->prepare("SELECT nick, inval FROM user WHERE id=?");
-	$inc_nick_inval = $dbh->prepare("UPDATE user SET inval=inval+1 WHERE id=?");
+	$get_nick_inval = undef; #$dbh->prepare("SELECT nick, inval FROM user WHERE id=?");
+	$inc_nick_inval = undef; #$dbh->prepare("UPDATE user SET inval=inval+1 WHERE id=?");
 
-	$is_registered = $dbh->prepare("SELECT 1 FROM nickalias WHERE alias=?");
-	$is_alias_of = $dbh->prepare("SELECT 1 FROM nickalias AS n1 LEFT JOIN nickalias AS n2 ON n1.nrid=n2.nrid
-		WHERE n1.alias=? AND n2.alias=? LIMIT 1");
+	$is_registered = undef; #$dbh->prepare("SELECT 1 FROM nickalias WHERE alias=?");
+	$is_alias_of = undef; #$dbh->prepare("SELECT 1 FROM nickalias AS n1 LEFT JOIN nickalias AS n2 ON n1.nrid=n2.nrid
+		#WHERE n1.alias=? AND n2.alias=? LIMIT 1");
 
-	$get_guest = $dbh->prepare("SELECT guest FROM user WHERE nick=?");
-	$set_guest = $dbh->prepare("UPDATE user SET guest=? WHERE nick=?");
+	$get_guest = undef; #$dbh->prepare("SELECT guest FROM user WHERE nick=?");
+	$set_guest = undef; #$dbh->prepare("UPDATE user SET guest=? WHERE nick=?");
 
-	$get_lock = $dbh->prepare("SELECT GET_LOCK(?, 10)");
-	$release_lock = $dbh->prepare("SELECT RELEASE_LOCK(?)");
+	$get_lock = undef; #$dbh->prepare("SELECT GET_LOCK(?, 10)");
+	$release_lock = undef; #$dbh->prepare("SELECT RELEASE_LOCK(?)");
 
-	$get_umodes = $dbh->prepare("SELECT modes FROM user WHERE id=?");
-	$set_umodes = $dbh->prepare("UPDATE user SET modes=? WHERE id=?");
+	$get_umodes = undef; #$dbh->prepare("SELECT modes FROM user WHERE id=?");
+	$set_umodes = undef; #$dbh->prepare("UPDATE user SET modes=? WHERE id=?");
 	
-	$get_info = $dbh->prepare("SELECT nickreg.email, nickreg.regd, nickreg.last, nickreg.flags, nickreg.ident,
-		nickreg.vhost, nickreg.gecos, nickalias.last
-		FROM nickreg, nickalias WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
-	$get_nickreg_quit = $dbh->prepare("SELECT nicktext.data FROM nickreg, nicktext, nickalias
-		WHERE nickalias.nrid=nickreg.id AND nickalias.alias=? AND
-		(nicktext.nrid=nickreg.id AND nicktext.type=".NTF_QUIT.")");
-	$set_ident = $dbh->prepare("UPDATE user SET ident=? WHERE id=?");
-	$set_vhost = $dbh->prepare("UPDATE user SET vhost=? WHERE id=?");
-	$set_ip = $dbh->prepare("UPDATE user SET ip=? WHERE id=?");
-	$update_regnick_vhost = $dbh->prepare("UPDATE nickreg,nickid SET nickreg.vhost=?
-		WHERE nickreg.id=nickid.nrid AND nickid.id=?");
-	$get_regd_time = $dbh->prepare("SELECT nickreg.regd FROM nickreg, nickalias
-		WHERE nickalias.nrid=nickreg.id and nickalias.alias=?");
+	$get_info = undef; #$dbh->prepare("SELECT nickreg.email, nickreg.regd, nickreg.last, nickreg.flags, nickreg.ident,
+		#nickreg.vhost, nickreg.gecos, nickalias.last
+		#FROM nickreg, nickalias WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
+	$get_nickreg_quit = undef; #$dbh->prepare("SELECT nicktext.data FROM nickreg, nicktext, nickalias
+		#WHERE nickalias.nrid=nickreg.id AND nickalias.alias=? AND
+		#(nicktext.nrid=nickreg.id AND nicktext.type=".NTF_QUIT.")");
+	$set_ident = undef; #$dbh->prepare("UPDATE user SET ident=? WHERE id=?");
+	$set_vhost = undef; #$dbh->prepare("UPDATE user SET vhost=? WHERE id=?");
+	$set_ip = undef; #$dbh->prepare("UPDATE user SET ip=? WHERE id=?");
+	$update_regnick_vhost = undef; #$dbh->prepare("UPDATE nickreg,nickid SET nickreg.vhost=?
+		#WHERE nickreg.id=nickid.nrid AND nickid.id=?");
+	$get_regd_time = undef; #$dbh->prepare("SELECT nickreg.regd FROM nickreg, nickalias
+		#WHERE nickalias.nrid=nickreg.id and nickalias.alias=?");
 
-	$chk_clone_except = $dbh->prepare("SELECT
-		GREATEST(IF((user.ip >> (32 - sesexip.mask)) = (sesexip.ip >> (32 - sesexip.mask)), sesexip.lim, 0),
-		IF(IF(sesexname.serv, user.server, user.host) LIKE sesexname.host, sesexname.lim, 0)) AS n
-		FROM user, sesexip, sesexname WHERE user.id=? ORDER BY n DESC LIMIT 1");
-	$count_clones = $dbh->prepare("SELECT COUNT(*) FROM user WHERE ip=? AND online=1");
+	$chk_clone_except = undef; #$dbh->prepare("SELECT
+		#GREATEST(IF((user.ip >> (32 - sesexip.mask)) = (sesexip.ip >> (32 - sesexip.mask)), sesexip.lim, 0),
+		#IF(IF(sesexname.serv, user.server, user.host) LIKE sesexname.host, sesexname.lim, 0)) AS n
+		#FROM user, sesexip, sesexname WHERE user.id=? ORDER BY n DESC LIMIT 1");
+	$count_clones = undef; #$dbh->prepare("SELECT COUNT(*) FROM user WHERE ip=? AND online=1");
 
-	$get_root_nick = $dbh->prepare("SELECT nickreg.nick FROM nickreg, nickalias WHERE nickreg.id=nickalias.nrid AND nickalias.alias=?");
-	$get_id_nick = $dbh->prepare("SELECT nickreg.nick FROM nickreg WHERE nickreg.id=?");
-	$identify = $dbh->prepare("INSERT INTO nickid SELECT ?, nickalias.nrid FROM nickalias WHERE alias=?");
-	$identify_ign = $dbh->prepare("INSERT IGNORE INTO nickid SELECT ?, nickalias.nrid FROM nickalias WHERE alias=?");
-	$id_update = $dbh->prepare("UPDATE nickreg, user SET
-		nickreg.last=UNIX_TIMESTAMP(), nickreg.ident=user.ident,
-		nickreg.vhost=user.vhost, nickreg.gecos=user.gecos,
-		nickreg.nearexp=0, nickreg.flags = (nickreg.flags & ~". NRF_VACATION .")
-		WHERE nickreg.nick=? AND user.id=?");
-	$logout = $dbh->prepare("DELETE FROM nickid WHERE id=?");
-	$unidentify = $dbh->prepare("DELETE FROM nickid USING nickreg, nickid WHERE nickreg.nick=? AND nickid.nrid=nickreg.id");
+	$get_root_nick = undef; #$dbh->prepare("SELECT nickreg.nick FROM nickreg, nickalias WHERE nickreg.id=nickalias.nrid AND nickalias.alias=?");
+	$get_id_nick = undef; #$dbh->prepare("SELECT nickreg.nick FROM nickreg WHERE nickreg.id=?");
+	$identify = undef; #$dbh->prepare("INSERT INTO nickid SELECT ?, nickalias.nrid FROM nickalias WHERE alias=?");
+	$identify_ign = undef; #OB$dbh->prepare("INSERT IGNORE INTO nickid SELECT ?, nickalias.nrid FROM nickalias WHERE alias=?");
+	$id_update = undef; #OB$dbh->prepare("UPDATE nickreg, user SET
+		#nickreg.last=UNIX_TIMESTAMP(), nickreg.ident=user.ident,
+		#nickreg.vhost=user.vhost, nickreg.gecos=user.gecos,
+		#nickreg.nearexp=0, nickreg.flags = (nickreg.flags & ~". NRF_VACATION .")
+		#WHERE nickreg.nick=? AND user.id=?");
+	$logout = undef; #OD$dbh->prepare("DELETE FROM nickid WHERE id=?");
+	$unidentify = undef; #OB$dbh->prepare("DELETE FROM nickid USING nickreg, nickid WHERE nickreg.nick=? AND nickid.nrid=nickreg.id");
 
-	$update_lastseen = $dbh->prepare("UPDATE nickreg,nickid SET nickreg.last=UNIX_TIMESTAMP()
-		WHERE nickreg.id=nickid.nrid AND nickid.id=?");
-	$update_nickalias_last = $dbh->prepare("UPDATE nickalias SET last=UNIX_TIMESTAMP() WHERE alias=?");
-	$quit_update = $dbh->prepare("REPLACE INTO nicktext
-		SELECT nickreg.id, ".NTF_QUIT().", 0, NULL, ? FROM nickreg, nickid
-		WHERE nickreg.id=nickid.nrid AND nickid.id=?");
+	$update_lastseen = undef; #OB$dbh->prepare("UPDATE nickreg,nickid SET nickreg.last=UNIX_TIMESTAMP()
+		#WHERE nickreg.id=nickid.nrid AND nickid.id=?");
+	$update_nickalias_last = undef; #$dbh->prepare("UPDATE nickalias SET last=UNIX_TIMESTAMP() WHERE alias=?");
+	$quit_update = undef; #$dbh->prepare("REPLACE INTO nicktext
+		#SELECT nickreg.id, ".NTF_QUIT().", 0, NULL, ? FROM nickreg, nickid
+		#WHERE nickreg.id=nickid.nrid AND nickid.id=?");
 
-	$set_protect_level = $dbh->prepare("UPDATE nickalias SET protect=? WHERE alias=?");
+	$set_protect_level = undef; #$dbh->prepare("UPDATE nickalias SET protect=? WHERE alias=?");
 
 
-	$set_email = $dbh->prepare("UPDATE nickreg, nickalias SET nickreg.email=? WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
+	$set_email = undef; #$dbh->prepare("UPDATE nickreg, nickalias SET nickreg.email=? WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
 	
-	$set_pass = $dbh->prepare("UPDATE nickreg, nickalias SET nickreg.pass=? WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
+	$set_pass = undef; #$dbh->prepare("UPDATE nickreg, nickalias SET nickreg.pass=? WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
 
-	$get_register_lock = $dbh->prepare("LOCK TABLES nickalias WRITE, nickreg WRITE");
-	$register = $dbh->prepare("INSERT INTO nickreg SET nick=?, pass=?, email=?, flags=".NRF_HIDEMAIL().", regd=UNIX_TIMESTAMP(), last=UNIX_TIMESTAMP()");
-	$create_alias = $dbh->prepare("INSERT INTO nickalias SELECT id, ?, NULL, NULL FROM nickreg WHERE nick=?");
+	$get_register_lock = undef; #$dbh->prepare("LOCK TABLES nickalias WRITE, nickreg WRITE");
+	$register = undef; #$dbh->prepare("INSERT INTO nickreg SET nick=?, pass=?, email=?, flags=".NRF_HIDEMAIL().", regd=UNIX_TIMESTAMP(), last=UNIX_TIMESTAMP()");
+	$create_alias = undef; #$dbh->prepare("INSERT INTO nickalias SELECT id, ?, NULL, NULL FROM nickreg WHERE nick=?");
 
-	$drop = $dbh->prepare("DELETE FROM nickreg WHERE nick=?");
+	$drop = undef; #$dbh->prepare("DELETE FROM nickreg WHERE nick=?");
 	
-	$get_aliases = $dbh->prepare("SELECT nickalias.alias FROM nickalias, nickreg WHERE
-		nickalias.nrid=nickreg.id AND nickreg.nick=? ORDER BY nickalias.alias");
-	$get_glist = $dbh->prepare("SELECT nickalias.alias, nickalias.protect, nickalias.last 
-		FROM nickalias, nickreg WHERE
-		nickalias.nrid=nickreg.id AND nickreg.nick=? ORDER BY nickalias.alias");
-	$count_aliases = $dbh->prepare("SELECT COUNT(*) FROM nickalias, nickreg WHERE
-		nickalias.nrid=nickreg.id AND nickreg.nick=?");
-	$get_random_alias = $dbh->prepare("SELECT nickalias.alias FROM nickalias, nickreg WHERE
-		nickalias.nrid=nickreg.id AND nickreg.nick=? AND nickalias.alias != nickreg.nick LIMIT 1");
-	$delete_alias = $dbh->prepare("DELETE FROM nickalias WHERE alias=?");
-	$delete_aliases = $dbh->prepare("DELETE FROM nickalias USING nickreg, nickalias WHERE
-		nickalias.nrid=nickreg.id AND nickreg.nick=?");
+	$get_aliases = undef; #$dbh->prepare("SELECT nickalias.alias FROM nickalias, nickreg WHERE
+		#nickalias.nrid=nickreg.id AND nickreg.nick=? ORDER BY nickalias.alias");
+	$get_glist = undef; #$dbh->prepare("SELECT nickalias.alias, nickalias.protect, nickalias.last 
+		#FROM nickalias, nickreg WHERE
+		#nickalias.nrid=nickreg.id AND nickreg.nick=? ORDER BY nickalias.alias");
+	$count_aliases = undef; #$dbh->prepare("SELECT COUNT(*) FROM nickalias, nickreg WHERE
+		#nickalias.nrid=nickreg.id AND nickreg.nick=?");
+	$get_random_alias = undef; #$dbh->prepare("SELECT nickalias.alias FROM nickalias, nickreg WHERE
+		#nickalias.nrid=nickreg.id AND nickreg.nick=? AND nickalias.alias != nickreg.nick LIMIT 1");
+	$delete_alias = undef; #$dbh->prepare("DELETE FROM nickalias WHERE alias=?");
+	$delete_aliases = undef; #$dbh->prepare("DELETE FROM nickalias USING nickreg, nickalias WHERE
+		#nickalias.nrid=nickreg.id AND nickreg.nick=?");
 	
-	$get_all_access = $dbh->prepare("SELECT chanacc.chan, chanacc.level, chanacc.adder, chanacc.time FROM nickalias, chanacc WHERE chanacc.nrid=nickalias.nrid AND nickalias.alias=? ORDER BY chanacc.chan");
-	$del_all_access = $dbh->prepare("DELETE FROM chanacc USING chanacc, nickreg WHERE chanacc.nrid=nickreg.id AND nickreg.nick=?");
+	$get_all_access = undef; #$dbh->prepare("SELECT chanacc.chan, chanacc.level, chanacc.adder, chanacc.time FROM nickalias, chanacc WHERE chanacc.nrid=nickalias.nrid AND nickalias.alias=? ORDER BY chanacc.chan");
+	$del_all_access = undef; #$dbh->prepare("DELETE FROM chanacc USING chanacc, nickreg WHERE chanacc.nrid=nickreg.id AND nickreg.nick=?");
 	
-	$change_root = $dbh->prepare("UPDATE nickreg SET nick=? WHERE nick=?");
+	$change_root = undef; #$dbh->prepare("UPDATE nickreg SET nick=? WHERE nick=?");
 
-	$unlock_tables = $dbh->prepare("UNLOCK TABLES");
+	$unlock_tables = undef; #$dbh->prepare("UNLOCK TABLES");
 
-	$get_matching_nicks = $dbh->prepare("SELECT nickalias.alias, nickreg.nick, nickreg.ident, nickreg.vhost FROM nickalias, nickreg WHERE nickalias.nrid=nickreg.id AND nickalias.alias LIKE ? AND nickreg.ident LIKE ? AND nickreg.vhost LIKE ? LIMIT 50");
+	$get_matching_nicks = undef; #$dbh->prepare("SELECT nickalias.alias, nickreg.nick, nickreg.ident, nickreg.vhost FROM nickalias, nickreg WHERE nickalias.nrid=nickreg.id AND nickalias.alias LIKE ? AND nickreg.ident LIKE ? AND nickreg.vhost LIKE ? LIMIT 50");
 	
-	$cleanup_chanuser = $dbh->prepare("DELETE FROM chanuser USING chanuser
-		LEFT JOIN user ON (chanuser.nickid=user.id) WHERE user.id IS NULL;");
-	$cleanup_nickid = $dbh->prepare("DELETE FROM nickid, user USING nickid LEFT JOIN user ON(nickid.id=user.id) WHERE user.id IS NULL OR (user.online=0 AND quittime<?)");
-	$cleanup_users = $dbh->prepare("DELETE FROM user WHERE online=0 AND quittime<?");
+	$cleanup_chanuser = undef; #$dbh->prepare("DELETE FROM chanuser USING chanuser
+		#LEFT JOIN user ON (chanuser.nickid=user.id) WHERE user.id IS NULL;");
+	$cleanup_nickid = undef; #$dbh->prepare("DELETE FROM nickid, user USING nickid LEFT JOIN user ON(nickid.id=user.id) WHERE user.id IS NULL OR (user.online=0 AND quittime<?)");
+	$cleanup_users = undef; #$dbh->prepare("DELETE FROM user WHERE online=0 AND quittime<?");
 
-	$get_expired = $dbh->prepare("SELECT nickreg.nick, nickreg.email, nickreg.ident, nickreg.vhost
-		FROM nickreg LEFT JOIN nickid ON(nickreg.id=nickid.nrid)
-		LEFT JOIN svsop ON(nickreg.id=svsop.nrid)
-		WHERE nickid.nrid IS NULL AND svsop.nrid IS NULL ".
-		'AND ('.(services_conf_nearexpire ? 'nickreg.nearexp!=0 AND' : '').
-		" ( !(nickreg.flags & " . NRF_HOLD . ") AND !(nickreg.flags & " . NRF_VACATION . ") AND nickreg.last<? ) OR
-		( (nickreg.flags & " . NRF_VACATION . ") AND nickreg.last<? ) ) OR
-		( (nickreg.flags & ". NRF_EMAILREG .") AND nickreg.last<?)");
-	$get_near_expired = $dbh->prepare("SELECT nickreg.nick, nickreg.email, nickreg.flags, nickreg.last
-		FROM nickreg LEFT JOIN nickid ON(nickreg.id=nickid.nrid) 
-		LEFT JOIN svsop ON(nickreg.id=svsop.nrid)
-		WHERE nickid.nrid IS NULL AND svsop.nrid IS NULL AND nickreg.nearexp=0 AND
-		( ( !(nickreg.flags & " . NRF_HOLD . ") AND !(nickreg.flags & " . NRF_VACATION . ") AND nickreg.last<? ) OR
-		( (nickreg.flags & " . NRF_VACATION . ") AND nickreg.last<? )
-		)");
-	$set_near_expired = $dbh->prepare("UPDATE nickreg SET nearexp=1 WHERE nick=?");
+	$get_expired = undef; #$dbh->prepare("SELECT nickreg.nick, nickreg.email, nickreg.ident, nickreg.vhost
+		#FROM nickreg LEFT JOIN nickid ON(nickreg.id=nickid.nrid)
+		#LEFT JOIN svsop ON(nickreg.id=svsop.nrid)
+		#WHERE nickid.nrid IS NULL AND svsop.nrid IS NULL ".
+		#'AND ('.(services_conf_nearexpire ? 'nickreg.nearexp!=0 AND' : '').
+		#" ( !(nickreg.flags & " . NRF_HOLD . ") AND !(nickreg.flags & " . NRF_VACATION . ") AND nickreg.last<? ) OR
+		#( (nickreg.flags & " . NRF_VACATION . ") AND nickreg.last<? ) ) OR
+		#( (nickreg.flags & ". NRF_EMAILREG .") AND nickreg.last<?)");
+	$get_near_expired = undef; #$dbh->prepare("SELECT nickreg.nick, nickreg.email, nickreg.flags, nickreg.last
+		#FROM nickreg LEFT JOIN nickid ON(nickreg.id=nickid.nrid) 
+		#LEFT JOIN svsop ON(nickreg.id=svsop.nrid)
+		#WHERE nickid.nrid IS NULL AND svsop.nrid IS NULL AND nickreg.nearexp=0 AND
+		#( ( !(nickreg.flags & " . NRF_HOLD . ") AND !(nickreg.flags & " . NRF_VACATION . ") AND nickreg.last<? ) OR
+		#( (nickreg.flags & " . NRF_VACATION . ") AND nickreg.last<? )
+		#)");
+	$set_near_expired = undef; #$dbh->prepare("UPDATE nickreg SET nearexp=1 WHERE nick=?");
 
-	$get_watches = $dbh->prepare("SELECT watch.mask, watch.time
-		FROM watch
-		JOIN nickalias ON (watch.nrid=nickalias.nrid)
-		WHERE nickalias.alias=?");
-	$check_watch = $dbh->prepare("SELECT 1
-		FROM watch
-		JOIN nickalias ON (watch.nrid=nickalias.nrid)
-		WHERE nickalias.alias=? AND watch.mask=?");
-	$set_watch = $dbh->prepare("INSERT INTO watch SELECT nrid, ?, ? FROM nickalias WHERE alias=?");
-	$del_watch = $dbh->prepare("DELETE FROM watch USING watch
-		JOIN nickalias ON (watch.nrid=nickalias.nrid)
-		WHERE nickalias.alias=? AND watch.mask=?");
-	$drop_watch = $dbh->prepare("DELETE FROM watch
-		USING nickreg JOIN watch ON (watch.nrid=nickreg.id)
-		WHERE nickreg.nick=?");
-	$get_silences = $dbh->prepare("SELECT silence.mask, silence.time, silence.expiry, silence.comment
-		FROM silence
-		JOIN nickalias ON (silence.nrid=nickalias.nrid)
-		WHERE nickalias.alias=? ORDER BY silence.time");
-	$check_silence = $dbh->prepare("SELECT 1 FROM silence
-		JOIN nickalias ON (silence.nrid=nickalias.nrid)
-		WHERE nickalias.alias=? AND silence.mask=?");
-	$set_silence = $dbh->prepare("INSERT INTO silence SELECT nrid, ?, ?, ?, ? FROM nickalias WHERE alias=?");
-	$del_silence = $dbh->prepare("DELETE FROM silence USING silence, nickalias
-		WHERE silence.nrid=nickalias.nrid AND nickalias.alias=? AND silence.mask=?");
-	$drop_silence = $dbh->prepare("DELETE FROM silence USING nickreg, silence
-		WHERE silence.nrid=nickreg.id AND nickreg.nick=?");
-	$get_expired_silences = $dbh->prepare("SELECT nickreg.nick, silence.mask, silence.comment
-		FROM nickreg
-		JOIN silence ON (nickreg.id=silence.nrid)
-		WHERE silence.expiry < UNIX_TIMESTAMP() AND silence.expiry!=0 ORDER BY nickreg.nick");
-	$del_expired_silences = $dbh->prepare("DELETE silence.* FROM silence
-		WHERE silence.expiry < UNIX_TIMESTAMP() AND silence.expiry!=0");
-	$get_silence_by_num = $dbh->prepare("SELECT silence.mask, silence.time, silence.expiry, silence.comment
-		FROM silence
-		JOIN nickalias ON (silence.nrid=nickalias.nrid)
-		WHERE nickalias.alias=? ORDER BY silence.time LIMIT 1 OFFSET ?");
-	$get_silence_by_num->bind_param(2, 0, SQL_INTEGER);
+	$get_watches = undef; #$dbh->prepare("SELECT watch.mask, watch.time
+		#FROM watch
+		#JOIN nickalias ON (watch.nrid=nickalias.nrid)
+		#WHERE nickalias.alias=?");
+	$check_watch = undef; #$dbh->prepare("SELECT 1
+		#FROM watch
+		#JOIN nickalias ON (watch.nrid=nickalias.nrid)
+		#WHERE nickalias.alias=? AND watch.mask=?");
+	$set_watch = undef; #$dbh->prepare("INSERT INTO watch SELECT nrid, ?, ? FROM nickalias WHERE alias=?");
+	$del_watch = undef; #$dbh->prepare("DELETE FROM watch USING watch
+		#JOIN nickalias ON (watch.nrid=nickalias.nrid)
+		#WHERE nickalias.alias=? AND watch.mask=?");
+	$drop_watch = undef; #$dbh->prepare("DELETE FROM watch
+		#USING nickreg JOIN watch ON (watch.nrid=nickreg.id)
+		#WHERE nickreg.nick=?");
+	$get_silences = undef; #$dbh->prepare("SELECT silence.mask, silence.time, silence.expiry, silence.comment
+		#FROM silence
+		#JOIN nickalias ON (silence.nrid=nickalias.nrid)
+		#WHERE nickalias.alias=? ORDER BY silence.time");
+	$check_silence = undef; #$dbh->prepare("SELECT 1 FROM silence
+		#JOIN nickalias ON (silence.nrid=nickalias.nrid)
+		#WHERE nickalias.alias=? AND silence.mask=?");
+	$set_silence = undef; #$dbh->prepare("INSERT INTO silence SELECT nrid, ?, ?, ?, ? FROM nickalias WHERE alias=?");
+	$del_silence = undef; #$dbh->prepare("DELETE FROM silence USING silence, nickalias
+		#WHERE silence.nrid=nickalias.nrid AND nickalias.alias=? AND silence.mask=?");
+	$drop_silence = undef; #$dbh->prepare("DELETE FROM silence USING nickreg, silence
+		undef; #WHERE silence.nrid=nickreg.id AND nickreg.nick=?");
+	$get_expired_silences = undef; #$dbh->prepare("SELECT nickreg.nick, silence.mask, silence.comment
+		#FROM nickreg
+		#JOIN silence ON (nickreg.id=silence.nrid)
+		#WHERE silence.expiry < UNIX_TIMESTAMP() AND silence.expiry!=0 ORDER BY nickreg.nick");
+	$del_expired_silences = undef; #$dbh->prepare("DELETE silence.* FROM silence
+		#WHERE silence.expiry < UNIX_TIMESTAMP() AND silence.expiry!=0");
+	$get_silence_by_num = undef; #$dbh->prepare("SELECT silence.mask, silence.time, silence.expiry, silence.comment
+		#FROM silence
+		#JOIN nickalias ON (silence.nrid=nickalias.nrid)
+		#WHERE nickalias.alias=? ORDER BY silence.time LIMIT 1 OFFSET ?");
+	#$get_silence_by_num->bind_param(2, 0, SQL_INTEGER);
 
-	$get_seen = $dbh->prepare("SELECT nickalias.alias, nickreg.nick, nickreg.last FROM nickreg, nickalias 
-		WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
+	$get_seen = undef; #$dbh->prepare("SELECT nickalias.alias, nickreg.nick, nickreg.last FROM nickreg, nickalias 
+		#WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
 
-	$set_greet = $dbh->prepare("REPLACE INTO nicktext SELECT nickreg.id, ".NTF_GREET.", 0, NULL, ? 
-		FROM nickreg, nickalias WHERE nickreg.id=nickalias.nrid AND nickalias.alias=?");
-	$get_greet = $dbh->prepare("SELECT nicktext.data FROM nicktext, nickid
-		WHERE nicktext.nrid=nickid.nrid AND nicktext.type=".NTF_GREET." AND nickid.id=?
-		LIMIT 1");
-	$get_greet_nick = $dbh->prepare("SELECT nicktext.data FROM nicktext, nickalias
-		WHERE nicktext.nrid=nickalias.nrid AND nicktext.type=".NTF_GREET." AND nickalias.alias=?");
-	$del_greet = $dbh->prepare("DELETE nicktext.* FROM nicktext, nickreg, nickalias WHERE
-		nicktext.type=".NTF_GREET." AND nickreg.id=nickalias.nrid AND nickalias.alias=?");
+	$set_greet = undef; #$dbh->prepare("REPLACE INTO nicktext SELECT nickreg.id, ".NTF_GREET.", 0, NULL, ? 
+		#FROM nickreg, nickalias WHERE nickreg.id=nickalias.nrid AND nickalias.alias=?");
+	$get_greet = undef; #$dbh->prepare("SELECT nicktext.data FROM nicktext, nickid
+		#WHERE nicktext.nrid=nickid.nrid AND nicktext.type=".NTF_GREET." AND nickid.id=?
+		#LIMIT 1");
+	$get_greet_nick = undef; #$dbh->prepare("SELECT nicktext.data FROM nicktext, nickalias
+		#WHERE nicktext.nrid=nickalias.nrid AND nicktext.type=".NTF_GREET." AND nickalias.alias=?");
+	$del_greet = undef; #$dbh->prepare("DELETE nicktext.* FROM nicktext, nickreg, nickalias WHERE
+		#nicktext.type=".NTF_GREET." AND nickreg.id=nickalias.nrid AND nickalias.alias=?");
 
-	$get_num_nicktext_type = $dbh->prepare("SELECT COUNT(nicktext.id) FROM nicktext, nickalias
-		WHERE nicktext.nrid=nickalias.nrid AND nickalias.alias=? AND nicktext.type=?");
-	$drop_nicktext = $dbh->prepare("DELETE FROM nicktext USING nickreg
-		JOIN nicktext ON (nicktext.nrid=nickreg.id)
-		WHERE nickreg.nick=?");
+	$get_num_nicktext_type = undef; #$dbh->prepare("SELECT COUNT(nicktext.id) FROM nicktext, nickalias
+		#WHERE nicktext.nrid=nickalias.nrid AND nickalias.alias=? AND nicktext.type=?");
+	$drop_nicktext = undef; #$dbh->prepare("DELETE FROM nicktext USING nickreg
+		#JOIN nicktext ON (nicktext.nrid=nickreg.id)
+		#WHERE nickreg.nick=?");
 
-	$get_auth_chan = $dbh->prepare("SELECT nicktext.data FROM nicktext, nickalias WHERE
-		nicktext.nrid=nickalias.nrid AND nicktext.type=(".NTF_AUTH().") AND nickalias.alias=? AND nicktext.chan=?");
-	$get_auth_num = $dbh->prepare("SELECT nicktext.chan, nicktext.data FROM nicktext, nickalias WHERE 
-		nicktext.nrid=nickalias.nrid AND nicktext.type=(".NTF_AUTH().") AND nickalias.alias=? LIMIT 1 OFFSET ?");
-	$get_auth_num->bind_param(2, 0, SQL_INTEGER);
-	$del_auth = $dbh->prepare("DELETE nicktext.* FROM nicktext, nickalias WHERE
-		nicktext.nrid=nickalias.nrid AND nicktext.type=(".NTF_AUTH().") AND nickalias.alias=? AND nicktext.chan=?");;
-	$list_auth = $dbh->prepare("SELECT nicktext.chan, nicktext.data FROM nicktext, nickalias WHERE
-		nicktext.nrid=nickalias.nrid AND nicktext.type=(".NTF_AUTH().") AND nickalias.alias=?");
+	$get_auth_chan = undef; #$dbh->prepare("SELECT nicktext.data FROM nicktext, nickalias WHERE
+		#nicktext.nrid=nickalias.nrid AND nicktext.type=(".NTF_AUTH().") AND nickalias.alias=? AND nicktext.chan=?");
+	$get_auth_num = undef; #$dbh->prepare("SELECT nicktext.chan, nicktext.data FROM nicktext, nickalias WHERE 
+		#nicktext.nrid=nickalias.nrid AND nicktext.type=(".NTF_AUTH().") AND nickalias.alias=? LIMIT 1 OFFSET ?");
+	#$get_auth_num->bind_param(2, 0, SQL_INTEGER);
+	$del_auth = undef; #$dbh->prepare("DELETE nicktext.* FROM nicktext, nickalias WHERE
+		#nicktext.nrid=nickalias.nrid AND nicktext.type=(".NTF_AUTH().") AND nickalias.alias=? AND nicktext.chan=?");;
+	$list_auth = undef; #$dbh->prepare("SELECT nicktext.chan, nicktext.data FROM nicktext, nickalias WHERE
+		#nicktext.nrid=nickalias.nrid AND nicktext.type=(".NTF_AUTH().") AND nickalias.alias=?");
 
-	$del_nicktext = $dbh->prepare("DELETE nicktext.* FROM nickreg
-		JOIN nickalias ON (nickalias.nrid=nickreg.id)
-		JOIN nicktext ON (nicktext.nrid=nickreg.id)
-		WHERE nicktext.type=? AND nickalias.alias=?");
+	$del_nicktext = undef; #$dbh->prepare("DELETE nicktext.* FROM nickreg
+		#JOIN nickalias ON (nickalias.nrid=nickreg.id)
+		#JOIN nicktext ON (nicktext.nrid=nickreg.id)
+		#WHERE nicktext.type=? AND nickalias.alias=?");
 
-	$set_umode_ntf = $dbh->prepare("REPLACE INTO nicktext SELECT nickreg.id, ".NTF_UMODE().", 1, ?, NULL
-		FROM nickreg, nickalias WHERE nickreg.id=nickalias.nrid AND nickalias.alias=?");
-	$get_umode_ntf = $dbh->prepare("SELECT nicktext.chan FROM nickreg, nickalias, nicktext
-		WHERE nicktext.type=(".NTF_UMODE().") AND nicktext.nrid=nickalias.nrid AND nickalias.alias=?");
+	$set_umode_ntf = undef; #$dbh->prepare("REPLACE INTO nicktext SELECT nickreg.id, ".NTF_UMODE().", 1, ?, NULL
+		#FROM nickreg, nickalias WHERE nickreg.id=nickalias.nrid AND nickalias.alias=?");
+	$get_umode_ntf = undef; #$dbh->prepare("SELECT nicktext.chan FROM nickreg, nickalias, nicktext
+		#WHERE nicktext.type=(".NTF_UMODE().") AND nicktext.nrid=nickalias.nrid AND nickalias.alias=?");
 
-	$set_vacation_ntf = $dbh->prepare("INSERT INTO nicktext SELECT nickreg.id, ".NTF_VACATION().", 0, ?, NULL
-		FROM nickreg, nickalias WHERE nickreg.id=nickalias.nrid AND nickalias.alias=?");
-	$get_vacation_ntf = $dbh->prepare("SELECT nicktext.chan FROM nickalias, nicktext
-		WHERE nicktext.nrid=nickalias.nrid AND nicktext.type=".NTF_VACATION()." AND nickalias.alias=?");
+	$set_vacation_ntf = undef; #$dbh->prepare("INSERT INTO nicktext SELECT nickreg.id, ".NTF_VACATION().", 0, ?, NULL
+		#FROM nickreg, nickalias WHERE nickreg.id=nickalias.nrid AND nickalias.alias=?");
+	$get_vacation_ntf = undef; #$dbh->prepare("SELECT nicktext.chan FROM nickalias, nicktext
+		#WHERE nicktext.nrid=nickalias.nrid AND nicktext.type=".NTF_VACATION()." AND nickalias.alias=?");
 
-	$set_authcode_ntf = $dbh->prepare("REPLACE INTO nicktext SELECT nickreg.id, ".NTF_AUTHCODE().", 0, '', ?
-		FROM nickreg, nickalias WHERE nickreg.id=nickalias.nrid AND nickalias.alias=?");
-	$get_authcode_ntf = $dbh->prepare("SELECT 1 FROM nickalias, nicktext
-		WHERE nicktext.nrid=nickalias.nrid AND nicktext.type=".NTF_AUTHCODE()." AND nickalias.alias=? AND nicktext.data=?");
+	$set_authcode_ntf = undef; #$dbh->prepare("REPLACE INTO nicktext SELECT nickreg.id, ".NTF_AUTHCODE().", 0, '', ?
+		#FROM nickreg, nickalias WHERE nickreg.id=nickalias.nrid AND nickalias.alias=?");
+	$get_authcode_ntf = undef; #$dbh->prepare("SELECT 1 FROM nickalias, nicktext
+		#WHERE nicktext.nrid=nickalias.nrid AND nicktext.type=".NTF_AUTHCODE()." AND nickalias.alias=? AND nicktext.data=?");
 
 }
+=cut
 import SrSv::MySQL::Stub {
 	add_profile_ntf => ['INSERT', "REPLACE INTO nicktext SELECT nickreg.id, @{[NTF_PROFILE]}, 0, ?, ?
 		FROM nickreg JOIN nickalias ON (nickreg.id=nickalias.nrid) WHERE nickalias.alias=?"],
@@ -481,7 +482,7 @@ import SrSv::MySQL::Stub {
 		JOIN nickalias ON (nicktext.nrid=nickalias.nrid)
 		WHERE nicktext.type=@{[NTF_JOIN]} AND nickalias.alias=? LIMIT 1 OFFSET ?"],
 };
-
+=cut
 
 ### NICKSERV COMMANDS ###
 
@@ -2808,7 +2809,7 @@ sub get_lock($) {
 		$cnt_lock++;
 	} else {
 		$cur_lock = $nick;
-		$get_lock->execute(sql_conf_mysql_db.".user.$nick");
+		#$get_lock->execute(sql_conf_mysql_db.".user.$nick");
 		$get_lock->finish;
 	}
 }
@@ -2835,7 +2836,7 @@ sub really_release_lock($) {
 	my ($nick) = @_;
 
 	$cnt_lock = 0;
-	$release_lock->execute(sql_conf_mysql_db.".user.$nick");
+	#$release_lock->execute(sql_conf_mysql_db.".user.$nick");
 	$release_lock->finish;
 	undef $cur_lock;
 }

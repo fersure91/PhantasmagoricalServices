@@ -29,8 +29,8 @@ use SrSv::Help qw( sendhelp );
 use SrSv::NickReg::Flags qw(NRF_NOHIGHLIGHT nr_chk_flag_user);
 use SrSv::NickReg::User qw(is_identified);
 
-use SrSv::MySQL '$dbh';
-use SrSv::MySQL::Glob;
+#use SrSv::MySQL '$dbh';
+#use SrSv::MySQL::Glob;
 
 our $hsnick_default = 'HostServ';
 our $hsnick = $hsnick_default;
@@ -43,13 +43,13 @@ our (
 );
 
 sub init() {
-	$set_vhost = $dbh->prepare("REPLACE INTO vhost SELECT id, ?, ?, ?, UNIX_TIMESTAMP() FROM nickreg WHERE nick=?");
-	$get_vhost = $dbh->prepare("SELECT vhost.ident, vhost.vhost FROM vhost, nickalias WHERE nickalias.nrid=vhost.nrid AND nickalias.alias=?");
-	$del_vhost = $dbh->prepare("DELETE FROM vhost USING vhost, nickreg WHERE nickreg.nick=? AND vhost.nrid=nickreg.id");
+	$set_vhost = undef; #$dbh->prepare("REPLACE INTO vhost SELECT id, ?, ?, ?, UNIX_TIMESTAMP() FROM nickreg WHERE nick=?");
+	$get_vhost = undef; #$dbh->prepare("SELECT vhost.ident, vhost.vhost FROM vhost, nickalias WHERE nickalias.nrid=vhost.nrid AND nickalias.alias=?");
+	$del_vhost = undef; #$dbh->prepare("DELETE FROM vhost USING vhost, nickreg WHERE nickreg.nick=? AND vhost.nrid=nickreg.id");
 
-	$get_matching_vhosts = $dbh->prepare("SELECT nickreg.nick, vhost.ident, vhost.vhost, vhost.adder, vhost.time FROM
-		vhost, nickreg WHERE vhost.nrid=nickreg.id AND nickreg.nick LIKE ? AND vhost.ident LIKE ? AND vhost.vhost LIKE ? 
-		ORDER BY nickreg.nick");
+	$get_matching_vhosts = undef; #$dbh->prepare("SELECT nickreg.nick, vhost.ident, vhost.vhost, vhost.adder, vhost.time FROM
+		#vhost, nickreg WHERE vhost.nrid=nickreg.id AND nickreg.nick LIKE ? AND vhost.ident LIKE ? AND vhost.vhost LIKE ? 
+		#ORDER BY nickreg.nick");
 }
 
 sub dispatch($$$) {

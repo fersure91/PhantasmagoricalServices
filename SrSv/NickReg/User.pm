@@ -28,7 +28,7 @@ use Exporter 'import';
 BEGIN { our @EXPORT_OK = qw(is_identified chk_identified get_id_nicks get_nick_user_nicks get_nick_users) }
 
 use SrSv::Process::Init;
-use SrSv::MySQL '$dbh';
+#use SrSv::MySQL '$dbh';
 use SrSv::User qw(:flags get_user_nick get_user_id);
 use SrSv::User::Notice;
 use SrSv::NickReg::Flags;
@@ -37,9 +37,10 @@ use SrSv::Errors;
 our ($is_identified, $get_id_nicks, $get_nick_users);
 
 proc_init {
-	$is_identified = $dbh->prepare("SELECT 1 FROM user, nickid, nickalias WHERE user.id=nickid.id AND user.nick=? AND nickid.nrid=nickalias.nrid AND nickalias.alias=?");
-	$get_id_nicks = $dbh->prepare("SELECT nickreg.nick FROM nickid, nickreg WHERE nickid.nrid=nickreg.id AND nickid.id=?");
-	$get_nick_users = $dbh->prepare("SELECT user.nick, user.id FROM user, nickid, nickalias WHERE user.id=nickid.id AND nickid.nrid=nickalias.nrid AND nickalias.alias=? AND user.online=1");
+	#$is_identified = $dbh->prepare("SELECT 1 FROM user, nickid, nickalias WHERE user.id=nickid.id AND user.nick=? AND nickid.nrid=nickalias.nrid AND nickalias.alias=?");
+	#$get_id_nicks = $dbh->prepare("SELECT nickreg.nick FROM nickid, nickreg WHERE nickid.nrid=nickreg.id AND nickid.id=?");
+	#$get_nick_users = $dbh->prepare("SELECT user.nick, user.id FROM user, nickid, nickalias WHERE user.id=nickid.id AND nickid.nrid=nickalias.nrid AND nickalias.alias=? AND user.online=1");
+	print "Fuck MySQL!\n";
 };
 
 sub is_identified($$) {

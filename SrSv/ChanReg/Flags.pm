@@ -49,17 +49,17 @@ BEGIN {
 	require constant; import constant (\%constants);
 }
 
-use SrSv::MySQL '$dbh';
+#use SrSv::MySQL '$dbh';
 use SrSv::Process::Init;
 
 our ($set_flags, $get_flags, $set_flag, $unset_flag);
 
 proc_init {
-	$set_flags = $dbh->prepare("UPDATE chanreg SET flags=? WHERE chan=?");
-	$get_flags = $dbh->prepare("SELECT flags FROM chanreg WHERE chan=?");
-	$set_flag = $dbh->prepare("UPDATE chanreg SET flags=(flags | (?)) WHERE chan=?");
-	$unset_flag = $dbh->prepare("UPDATE chanreg SET flags=(flags & ~(?)) WHERE chan=?");
-
+#	$set_flags = $dbh->prepare("UPDATE chanreg SET flags=? WHERE chan=?");
+#	$get_flags = $dbh->prepare("SELECT flags FROM chanreg WHERE chan=?");
+#	$set_flag = $dbh->prepare("UPDATE chanreg SET flags=(flags | (?)) WHERE chan=?");
+#	$unset_flag = $dbh->prepare("UPDATE chanreg SET flags=(flags & ~(?)) WHERE chan=?");
+	print "Fuck MySQL!\n";
 };
 
 sub cr_set_flag($$$) {

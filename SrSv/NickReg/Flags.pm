@@ -42,22 +42,22 @@ BEGIN {
 }
 
 use SrSv::Process::Init;
-use SrSv::MySQL '$dbh';
+#use SrSv::MySQL '$dbh';
 
 use SrSv::User qw(get_user_id);
 
 our ($get_flags, $set_flag, $unset_flag, $set_flags, $get_nickreg_flags_user);
 
-proc_init {
-	$get_flags = $dbh->prepare("SELECT nickreg.flags FROM nickreg, nickalias WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
-	$set_flag = $dbh->prepare("UPDATE nickreg, nickalias SET nickreg.flags=(nickreg.flags | (?)) WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
-	$set_flags = $dbh->prepare("UPDATE nickreg, nickalias SET nickreg.flags=? WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
-	$unset_flag = $dbh->prepare("UPDATE nickreg, nickalias SET nickreg.flags=(nickreg.flags & ~(?)) WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
-	$get_nickreg_flags_user = $dbh->prepare("SELECT BIT_OR(nickreg.flags) FROM user
-		JOIN nickid ON (user.id=nickid.id)
-		JOIN nickreg ON(nickid.nrid=nickreg.id)
-		WHERE user.id=? GROUP BY user.id");
-};
+#proc_init {
+#	$get_flags = $dbh->prepare("SELECT nickreg.flags FROM nickreg, nickalias WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
+#	$set_flag = $dbh->prepare("UPDATE nickreg, nickalias SET nickreg.flags=(nickreg.flags | (?)) WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
+#	$set_flags = $dbh->prepare("UPDATE nickreg, nickalias SET nickreg.flags=? WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
+#	$unset_flag = $dbh->prepare("UPDATE nickreg, nickalias SET nickreg.flags=(nickreg.flags & ~(?)) WHERE nickalias.nrid=nickreg.id AND nickalias.alias=?");
+#	$get_nickreg_flags_user = $dbh->prepare("SELECT BIT_OR(nickreg.flags) FROM user
+#		JOIN nickid ON (user.id=nickid.id)
+#		JOIN nickreg ON(nickid.nrid=nickreg.id)
+#		WHERE user.id=? GROUP BY user.id");
+#};
 
 sub nr_set_flag($$;$) {
 	my ($nick, $flag, $sign) = @_;

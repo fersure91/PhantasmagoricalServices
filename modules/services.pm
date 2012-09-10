@@ -40,10 +40,12 @@ use SrSv::Conf::Parameters services => [
 	[hostserv => undef],
 ];
 
-use DBI;
-use SrSv::MySQL qw($dbh);
-use SrSv::Conf qw(main services sql);
-use SrSv::Conf2Consts qw(main services sql);
+#use DBI;
+#use SrSv::MySQL qw($dbh);
+#use SrSv::Conf qw(main services sql);
+use SrSv::Conf qw(main services);
+#use SrSv::Conf2Consts qw(main services sql);
+use SrSv::Conf2Consts qw(main services);
 use SrSv::Timer qw(add_timer);
 use SrSv::Agent;
 use SrSv::IRCd::Event qw(addhandler);
@@ -203,15 +205,16 @@ sub maint {
 }
 
 sub init {
-	my $tmpdbh = DBI->connect("DBI:mysql:".sql_conf_mysql_db, sql_conf_mysql_user, sql_conf_mysql_pass, {  AutoCommit => 1, RaiseError => 1 });
+#	my $tmpdbh = DBI->connect("DBI:mysql:".sql_conf_mysql_db, sql_conf_mysql_user, sql_conf_mysql_pass, {  AutoCommit => 1, RaiseError => 1 });
 
-	$tmpdbh->do("TRUNCATE TABLE chanuser");
-	$tmpdbh->do("TRUNCATE TABLE nickchg");
-	$tmpdbh->do("TRUNCATE TABLE chan");
-	$tmpdbh->do("TRUNCATE TABLE chanban");
-	$tmpdbh->do("UPDATE user SET online=0, quittime=".time());
+#	$tmpdbh->do("TRUNCATE TABLE chanuser");
+#	$tmpdbh->do("TRUNCATE TABLE nickchg");
+#	$tmpdbh->do("TRUNCATE TABLE chan");
+#	$tmpdbh->do("TRUNCATE TABLE chanban");
+#	$tmpdbh->do("UPDATE user SET online=0, quittime=".time());
 
-	$tmpdbh->disconnect;
+#	$tmpdbh->disconnect;
+	print "Fuck MySQL!\n";
 }
 
 sub begin {
@@ -225,7 +228,8 @@ sub begin {
 }
 
 sub end {
-	$dbh->disconnect;
+	#$dbh->disconnect;
+	print "FUCK MYSQL!!!\n";
 }
 
 sub unload { }
