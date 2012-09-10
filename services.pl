@@ -1,5 +1,4 @@
-#!/usr/bin/perl
-
+#!/usr/bin/env perl
 #	This file is part of SurrealServices.
 #
 #	SurrealServices is free software; you can redistribute it and/or modify

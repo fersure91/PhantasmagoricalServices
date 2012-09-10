@@ -6,8 +6,7 @@ You will need to have all of these installed:
 * MySQL 4.1 or 5.0. 5.1 and up are not supported.
 * Event module from CPAN
 * Date::Parse module from CPAN
-Both the Event and Date::Parse modules should be available
-in your favourite distro.
+* Switch module from CPAN
 
 1. Create a MySQL database and user for services to use. Ask
 your system administrator or see the MySQL manual for instructions.

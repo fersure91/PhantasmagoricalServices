@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 sub say(@) {
 	print map({ "$_\n" } @_);
